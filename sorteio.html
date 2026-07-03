@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorteio - Pix Influência</title>
+    <!-- Adicionando o Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* MANTIDO O SEU CSS EXATAMENTE IGUAL */
+        /* CSS INTACTO */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: white; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .card-sorteio { background-color: #1e1e1e; border: 1px solid #444; border-radius: 20px; padding: 40px 30px; width: 100%; max-width: 500px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative; }
         .titulo-tela { color: #FFD700; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; }
@@ -27,26 +28,21 @@
 
     <div class="card-sorteio">
         <div class="titulo-tela">🏆 Tela de Sorteio</div>
-        
         <div id="avisoRecuperacao" class="aviso-recuperacao">🔄 Sistema recuperado: Carregando sorteios anteriores...</div>
-
         <div class="box-premio" id="boxPremioAtual">
             <p>Sorteando Agora:</p>
             <h2 id="nomePremioAtual">Conectando...</h2>
         </div>
-
         <div class="circulo-roleta" id="roleta">?</div>
-
         <button class="btn-sortear" id="btnSortear" onclick="iniciarSorteio()">🎲 Aguarde...</button>
-
         <div id="listaGanhadores"></div>
     </div>
 
     <script>
-        // 🚨 CONFIGURAÇÃO DO SUPABASE
+        // 🚨 CONFIGURAÇÃO DO SUPABASE (A variável de conexão agora chama-se 'banco')
         const SUPABASE_URL = 'https://lukdkotczqindytggpvm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1a2Rrb3RjenFpbmR5dGdncHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MzQ3NzMsImV4cCI6MjA5ODUxMDc3M30.YTx_2J0Ebr-fiXftPJqgvU90pRpkx664dKN9F2RxVjA';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const banco = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let edicaoEstaAberta = true;
         let edicaoAtualNome = "";
@@ -55,8 +51,7 @@
 
         async function carregarDadosSorteio() {
             try {
-                // 1. Puxa a edição e monta os prêmios
-                const { data: edicoes, error: errEd } = await supabase.from('gerenciador').select('*').or('status.ilike.ativa,status.ilike.pendente').limit(1);
+                const { data: edicoes, error: errEd } = await banco.from('gerenciador').select('*').or('status.ilike.ativa,status.ilike.pendente').limit(1);
                 
                 if (errEd || !edicoes || edicoes.length === 0) {
                     bloquearTela("🚫 NENHUMA EDIÇÃO ATIVA", "Sem edições");
@@ -78,8 +73,7 @@
                 if(config.premio_3_titulo) listaPremios.push({ icone: "🥉", titulo: "3º Prêmio", nome: config.premio_3_titulo });
 
                 if (listaPremios.length > 0) {
-                    // 2. Verifica se já existem ganhadores na tabela Sorteio
-                    const { data: bilhetes, error } = await supabase.from('sorteio').select('*').eq('edicao', edicaoAtualNome);
+                    const { data: bilhetes, error } = await banco.from('sorteio').select('*').eq('edicao', edicaoAtualNome);
                     
                     let sorteados = bilhetes.filter(b => b.status.toLowerCase() === 'premiado');
                     let qtdJaSorteados = sorteados.length;
@@ -152,8 +146,7 @@
             let intervalo = setInterval(() => { roleta.innerText = Math.floor(Math.random() * 999) + 1; }, 50);
 
             try {
-                // 1. Busca apenas os bilhetes PAGOS desta edição
-                const { data: pagos } = await supabase.from('sorteio').select('*').eq('edicao', edicaoAtualNome).ilike('status', 'pago');
+                const { data: pagos } = await banco.from('sorteio').select('*').eq('edicao', edicaoAtualNome).ilike('status', 'pago');
                 
                 clearInterval(intervalo);
 
@@ -165,11 +158,9 @@
                     return;
                 }
 
-                // 2. Sorteia um número aleatório da lista de pagos
                 let vencedor = pagos[Math.floor(Math.random() * pagos.length)];
 
-                // 3. Salva no banco de dados como Premiado
-                await supabase.from('sorteio').update({ status: 'Premiado' }).eq('id', vencedor.id);
+                await banco.from('sorteio').update({ status: 'Premiado' }).eq('id', vencedor.id);
 
                 roleta.innerText = vencedor.numero;
                 
@@ -189,8 +180,7 @@
                     atualizarVisorPremio();
                     btn.disabled = false;
                 } else {
-                    // Sendo o último prêmio, encerra a edição automaticamente no banco
-                    await supabase.from('gerenciador').update({ status: 'Concluída' }).eq('nome_edicao', edicaoAtualNome);
+                    await banco.from('gerenciador').update({ status: 'Concluída' }).eq('nome_edicao', edicaoAtualNome);
                     bloquearTela("🎉 TODOS OS PRÊMIOS SORTEADOS", "Sorteio Finalizado!");
                 }
 
