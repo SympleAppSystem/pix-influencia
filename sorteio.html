@@ -139,18 +139,31 @@
             let premioAtual = listaPremios[indicePremioAtual];
             
             btn.disabled = true;
-            btn.innerText = "Sorteando...";
 
-            // Inicia o efeito visual de trocar os números rápido
+            // Inicia a roleta a girar loucamente
             let intervalo = setInterval(() => { roleta.innerText = Math.floor(Math.random() * 999) + 1; }, 50);
 
             try {
-                // Busca quem pagou (isso agora acontece instantaneamente!)
+                // 1. Busca quem pagou no banco (agora super rápido)
                 const { data: pagos } = await banco.from('sorteio').select('*').eq('edicao', edicaoAtualNome).ilike('status', 'pago');
                 
-                // ⏱️ O SEGREDO DO SUSPENSE: Pausa dramática de 4 segundos (4000 ms) antes de parar a roleta
-                await new Promise(resolve => setTimeout(resolve, 4000));
+                // 2. A MÁGICA DO SUSPENSE: Contagem regressiva visível no botão!
+                btn.innerText = "A misturar os bilhetes... 4s";
+                await new Promise(r => setTimeout(r, 1000));
+                
+                btn.innerText = "A misturar os bilhetes... 3s";
+                await new Promise(r => setTimeout(r, 1000));
+                
+                btn.innerText = "A misturar os bilhetes... 2s";
+                await new Promise(r => setTimeout(r, 1000));
+                
+                btn.innerText = "A misturar os bilhetes... 1s";
+                await new Promise(r => setTimeout(r, 1000));
 
+                btn.innerText = "A PARAR A ROLETA!";
+                await new Promise(r => setTimeout(r, 500)); // Pequeno suspense final
+
+                // 3. Para a roleta visualmente
                 clearInterval(intervalo);
 
                 if (!pagos || pagos.length === 0) {
@@ -161,7 +174,7 @@
                     return;
                 }
 
-                // Sorteia e salva no banco
+                // 4. Elege o vencedor e salva no banco
                 let vencedor = pagos[Math.floor(Math.random() * pagos.length)];
                 await banco.from('sorteio').update({ status: 'Premiado' }).eq('id', vencedor.id);
 
