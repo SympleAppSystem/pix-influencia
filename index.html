@@ -315,7 +315,7 @@
             if(recarregar) { carregarNumeros(); }
         }
 
-        async function confirmarReserva() {
+       async function confirmarReserva() {
             let nome = document.getElementById('nome').value.trim();
             let whatsapp = document.getElementById('whatsapp').value.trim();
             let btn = document.getElementById('btnReservar');
@@ -326,7 +326,6 @@
             btn.disabled = true;
             
             try {
-                // Trocado supabase por banco
                 const { data: verificacao } = await banco.from('sorteio').select('numero, status').in('numero', numerosEscolhidos).eq('edicao', edicaoAtualNome);
                 let roubados = verificacao.filter(b => b.status.toLowerCase() !== 'livre');
                 
@@ -338,7 +337,6 @@
                 }
 
                 let dataAtual = new Date().toLocaleString("pt-BR");
-                // Trocado supabase por banco
                 const { error: erroUpdate } = await banco.from('sorteio').update({ status: 'Reservado', nome: nome, whatsapp: whatsapp, data: dataAtual }).in('numero', numerosEscolhidos).eq('edicao', edicaoAtualNome);
 
                 if (!erroUpdate) {
@@ -358,6 +356,11 @@
                     atualizarBarraCheckout();
                     document.getElementById('nome').value = '';
                     document.getElementById('whatsapp').value = '55';
+                    
+                    // 👇 AS DUAS LINHAS ADICIONADAS AQUI PARA CORRIGIR O BUG 👇
+                    btn.innerText = "Concluir Reserva";
+                    btn.disabled = false;
+                    
                 } else { 
                     mostrarErro("Erro ao efetuar reserva. Tente novamente."); 
                     btn.innerText = "Concluir Reserva"; 
