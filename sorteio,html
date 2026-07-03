@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteio - Pix Influência</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* MANTIDO O SEU CSS EXATAMENTE IGUAL */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: white; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card-sorteio { background-color: #1e1e1e; border: 1px solid #444; border-radius: 20px; padding: 40px 30px; width: 100%; max-width: 500px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative; }
+        .titulo-tela { color: #FFD700; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; }
+        .box-premio { border: 1px solid #FFD700; border-radius: 12px; padding: 15px; background-color: rgba(255, 215, 0, 0.05); margin-bottom: 30px; transition: 0.3s; }
+        .box-premio p { margin: 0 0 5px 0; font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+        .box-premio h2 { margin: 0; font-size: 22px; color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+        .circulo-roleta { background: linear-gradient(135deg, #ff9800, #ffc107); border: 5px solid white; border-radius: 50%; width: 160px; height: 160px; margin: 0 auto 40px auto; display: flex; justify-content: center; align-items: center; font-size: 70px; font-weight: 900; color: white; box-shadow: 0 0 30px rgba(255, 152, 0, 0.5); transition: all 0.3s; }
+        .btn-sortear { background: linear-gradient(90deg, #4CAF50, #2E8B57); color: white; border: none; border-radius: 30px; padding: 18px; width: 100%; font-size: 18px; font-weight: bold; text-transform: uppercase; cursor: pointer; box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4); transition: 0.3s; }
+        .btn-sortear:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6); }
+        .btn-bloqueado { background: #555 !important; box-shadow: none !important; cursor: not-allowed !important; color: #aaa !important; }
+        #listaGanhadores { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+        .resultado-box { background: #2a5298; padding: 15px; border-radius: 12px; border: 2px dashed #64b5f6; animation: fadeIn 0.5s; text-align: center; }
+        .aviso-recuperacao { color: #ff9800; font-size: 12px; margin-bottom: 15px; font-weight: bold; display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="card-sorteio">
+        <div class="titulo-tela">🏆 Tela de Sorteio</div>
+        
+        <div id="avisoRecuperacao" class="aviso-recuperacao">🔄 Sistema recuperado: Carregando sorteios anteriores...</div>
+
+        <div class="box-premio" id="boxPremioAtual">
+            <p>Sorteando Agora:</p>
+            <h2 id="nomePremioAtual">Conectando...</h2>
+        </div>
+
+        <div class="circulo-roleta" id="roleta">?</div>
+
+        <button class="btn-sortear" id="btnSortear" onclick="iniciarSorteio()">🎲 Aguarde...</button>
+
+        <div id="listaGanhadores"></div>
+    </div>
+
+    <script>
+        // 🚨 CONFIGURAÇÃO DO SUPABASE
+        const SUPABASE_URL = 'https://lukdkotczqindytggpvm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1a2Rrb3RjenFpbmR5dGdncHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MzQ3NzMsImV4cCI6MjA5ODUxMDc3M30.YTx_2J0Ebr-fiXftPJqgvU90pRpkx664dKN9F2RxVjA';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let edicaoEstaAberta = true;
+        let edicaoAtualNome = "";
+        let listaPremios = [];
+        let indicePremioAtual = 0;
+
+        async function carregarDadosSorteio() {
+            try {
+                // 1. Puxa a edição e monta os prêmios
+                const { data: edicoes, error: errEd } = await supabase.from('gerenciador').select('*').or('status.ilike.ativa,status.ilike.pendente').limit(1);
+                
+                if (errEd || !edicoes || edicoes.length === 0) {
+                    bloquearTela("🚫 NENHUMA EDIÇÃO ATIVA", "Sem edições");
+                    return;
+                }
+
+                let config = edicoes[0];
+                edicaoAtualNome = config.nome_edicao;
+
+                let statusEd = config.status ? config.status.toLowerCase() : "ativa";
+                if (statusEd === "concluída" || statusEd === "concluida" || statusEd === "encerrada") {
+                    edicaoEstaAberta = false;
+                    bloquearTela("🚫 EDIÇÃO JÁ SORTEADA", "Sorteio Encerrado");
+                    return; 
+                }
+
+                if(config.premio_1_titulo) listaPremios.push({ icone: "🥇", titulo: "1º Prêmio", nome: config.premio_1_titulo });
+                if(config.premio_2_titulo) listaPremios.push({ icone: "🥈", titulo: "2º Prêmio", nome: config.premio_2_titulo });
+                if(config.premio_3_titulo) listaPremios.push({ icone: "🥉", titulo: "3º Prêmio", nome: config.premio_3_titulo });
+
+                if (listaPremios.length > 0) {
+                    // 2. Verifica se já existem ganhadores na tabela Sorteio
+                    const { data: bilhetes, error } = await supabase.from('sorteio').select('*').eq('edicao', edicaoAtualNome);
+                    
+                    let sorteados = bilhetes.filter(b => b.status.toLowerCase() === 'premiado');
+                    let qtdJaSorteados = sorteados.length;
+
+                    if (qtdJaSorteados > 0) {
+                        document.getElementById('avisoRecuperacao').style.display = 'block';
+                        
+                        sorteados.forEach((ganhador, idx) => {
+                            let premioRef = listaPremios[idx];
+                            if(premioRef) {
+                                let htmlGanhador = `
+                                    <div class="resultado-box">
+                                        <p style="margin: 0 0 5px 0; color: #bbdefb; font-size: 14px;">${premioRef.icone} GANHADOR(A) DO ${premioRef.titulo.toUpperCase()} ${premioRef.icone}</p>
+                                        <h3 style="margin: 0 0 5px 0; font-size: 22px; color: white;">${ganhador.nome}</h3>
+                                        <p style="margin: 0 0 5px 0; color: #FFD700; font-weight: bold; font-size: 18px;">Bilhete Sorteado: ${ganhador.numero}</p>
+                                        <p style="margin: 0; color: #fff; font-size: 14px;">WhatsApp: ${ganhador.whatsapp}</p>
+                                    </div>
+                                `;
+                                document.getElementById('listaGanhadores').insertAdjacentHTML('afterbegin', htmlGanhador);
+                            }
+                        });
+                    }
+
+                    indicePremioAtual = qtdJaSorteados;
+
+                    if (indicePremioAtual >= listaPremios.length) {
+                        bloquearTela("🎉 TODOS OS PRÊMIOS SORTEADOS", "Sorteio Finalizado!");
+                    } else {
+                        atualizarVisorPremio();
+                    }
+                } else {
+                    bloquearTela("🚫 NENHUM PRÊMIO CADASTRADO", "Sem prêmios");
+                }
+
+            } catch (erro) {
+                document.getElementById('nomePremioAtual').innerText = "Erro de Conexão";
+                console.error(erro);
+            }
+        }
+
+        function atualizarVisorPremio() {
+            let premio = listaPremios[indicePremioAtual];
+            document.getElementById('nomePremioAtual').innerHTML = `${premio.icone} ${premio.titulo}: ${premio.nome}`;
+            document.getElementById('btnSortear').innerHTML = `🎲 Sortear ${premio.titulo}`;
+        }
+
+        function bloquearTela(textoBotao, textoPremio) {
+            let btn = document.getElementById('btnSortear');
+            btn.innerText = textoBotao;
+            btn.classList.add('btn-bloqueado');
+            btn.disabled = true;
+            document.getElementById('nomePremioAtual').innerText = textoPremio;
+            document.getElementById('roleta').style.filter = "grayscale(100%)";
+        }
+
+        async function iniciarSorteio() {
+            if (!edicaoEstaAberta || indicePremioAtual >= listaPremios.length) return; 
+
+            document.getElementById('avisoRecuperacao').style.display = 'none';
+
+            let btn = document.getElementById('btnSortear');
+            let roleta = document.getElementById('roleta');
+            let premioAtual = listaPremios[indicePremioAtual];
+            
+            let ehUltimoSorteio = (indicePremioAtual + 1 === listaPremios.length);
+            
+            btn.disabled = true;
+            btn.innerText = "Sorteando...";
+
+            let intervalo = setInterval(() => { roleta.innerText = Math.floor(Math.random() * 999) + 1; }, 50);
+
+            try {
+                // 1. Busca apenas os bilhetes PAGOS desta edição
+                const { data: pagos } = await supabase.from('sorteio').select('*').eq('edicao', edicaoAtualNome).ilike('status', 'pago');
+                
+                clearInterval(intervalo);
+
+                if (!pagos || pagos.length === 0) {
+                    roleta.innerText = "X";
+                    alert("Não há bilhetes 'Pagos' para sortear nesta edição.");
+                    btn.innerText = `🎲 Tentar Novamente (${premioAtual.titulo})`;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // 2. Sorteia um número aleatório da lista de pagos
+                let vencedor = pagos[Math.floor(Math.random() * pagos.length)];
+
+                // 3. Salva no banco de dados como Premiado
+                await supabase.from('sorteio').update({ status: 'Premiado' }).eq('id', vencedor.id);
+
+                roleta.innerText = vencedor.numero;
+                
+                let htmlGanhador = `
+                    <div class="resultado-box">
+                        <p style="margin: 0 0 5px 0; color: #bbdefb; font-size: 14px;">${premioAtual.icone} GANHADOR(A) DO ${premioAtual.titulo.toUpperCase()} ${premioAtual.icone}</p>
+                        <h3 style="margin: 0 0 5px 0; font-size: 22px; color: white;">${vencedor.nome}</h3>
+                        <p style="margin: 0 0 5px 0; color: #FFD700; font-weight: bold; font-size: 18px;">Bilhete Sorteado: ${vencedor.numero}</p>
+                        <p style="margin: 0; color: #fff; font-size: 14px;">WhatsApp: ${vencedor.whatsapp}</p>
+                    </div>
+                `;
+                document.getElementById('listaGanhadores').insertAdjacentHTML('afterbegin', htmlGanhador);
+
+                indicePremioAtual++; 
+
+                if (indicePremioAtual < listaPremios.length) {
+                    atualizarVisorPremio();
+                    btn.disabled = false;
+                } else {
+                    // Sendo o último prêmio, encerra a edição automaticamente no banco
+                    await supabase.from('gerenciador').update({ status: 'Concluída' }).eq('nome_edicao', edicaoAtualNome);
+                    bloquearTela("🎉 TODOS OS PRÊMIOS SORTEADOS", "Sorteio Finalizado!");
+                }
+
+            } catch (erro) {
+                clearInterval(intervalo);
+                roleta.innerText = "?";
+                alert("Erro de conexão com o servidor. Tente novamente.");
+                btn.innerText = `🎲 Sortear Novamente`;
+                btn.disabled = false;
+            }
+        }
+        carregarDadosSorteio();
+    </script>
+</body>
+</html>
