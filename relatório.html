@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório - Pix Influência</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* MANTIDO O SEU CSS EXATAMENTE IGUAL */
+        @page { size: A4 landscape; margin: 15mm; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .controls-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid #2a5298;}
+        .select-group label { font-weight: bold; margin-right: 10px; color: #333; font-size: 16px;}
+        .select-group select { padding: 10px 15px; border-radius: 6px; border: 1px solid #ccc; font-size: 15px; outline: none; min-width: 250px; font-weight: bold; color: #2a5298; cursor: pointer; background-color: #f9f9f9;}
+        .btn-imprimir { padding: 12px 25px; background: #FFD700; color: #000; border: none; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4); transition: 0.3s; }
+        .btn-imprimir:hover { background: #e6c200; transform: translateY(-2px); }
+        .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #2a5298; padding-bottom: 15px; margin-bottom: 25px; }
+        .header-titles h1 { text-transform: uppercase; font-size: 24px; font-weight: 900; color: #000; margin: 0 0 5px 0; letter-spacing: 1px; }
+        .header-titles p { margin: 0; color: #2a5298; font-weight: bold; font-size: 16px; }
+        .header-info { text-align: right; color: #666; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th { background-color: #2a5298; color: white; padding: 12px; font-weight: bold; text-align: center; text-transform: uppercase; border: 1px solid #1e3c72; }
+        td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: middle; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .text-center { text-align: center; }
+        .text-bold { font-weight: bold; }
+        .status-pago { color: #2E8B57; font-weight: bold; background-color: #e8f5e9; }
+        .status-reservado { color: #f39c12; font-weight: bold; background-color: #fdf2e9; }
+        .btn-whats-pequeno { background: #25D366; color: white; padding: 8px 12px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 13px; display: inline-block; transition: 0.2s; box-shadow: 0 2px 5px rgba(37, 211, 102, 0.3);}
+        .btn-whats-pequeno:hover { background: #1ebd57; transform: translateY(-2px); }
+        .summary-wrapper { display: flex; justify-content: flex-end; gap: 20px; margin-top: 30px; }
+        .summary-card { background: #fff; border: 1px solid #ddd; border-left: 6px solid #2a5298; padding: 15px 25px; border-radius: 8px; text-align: right; min-width: 200px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .summary-card.green { border-left-color: #2E8B57; }
+        .summary-title { font-size: 12px; color: #777; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .summary-value { font-size: 26px; font-weight: 900; color: #333; }
+        .summary-value.green-text { color: #2E8B57; }
+        @media print { body { background: white; padding: 0; margin: 0; } .container { box-shadow: none; padding: 0; } .controls-wrapper { display: none !important; } .col-acao { display: none !important; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="controls-wrapper">
+            <div class="select-group">
+                <label for="edicaoSelect">📅 Edição:</label>
+                <select id="edicaoSelect" onchange="mudarEdicao()">
+                    <option value="">Carregando edições...</option>
+                </select>
+            </div>
+            <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Relatório</button>
+        </div>
+
+        <div class="header">
+            <div class="header-titles">
+                <h1>PIX INFLUÊNCIA</h1>
+                <p id="titulo">Carregando Relatório...</p>
+                <p style="font-size: 13px; color: #666; margin-top: 5px;">Edição Filtrada: <b id="nomeEdicaoFiltro">--</b></p>
+            </div>
+            <div class="header-info">
+                Data de Emissão: <b id="dataAtual">--/--/----</b><br>
+                Valor da Cota: <b id="valorCotaDisplay">R$ 0,00</b>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 12%;">Nº dos Bilhetes</th>
+                    <th style="width: 28%;">Nome do Cliente</th>
+                    <th style="width: 15%;">WhatsApp</th>
+                    <th style="width: 20%;">Data/Hora</th>
+                    <th style="width: 10%;">Status</th>
+                    <th class="col-acao" style="width: 15%;">Ação</th> </tr>
+            </thead>
+            <tbody id="tabelaCorpo">
+                <tr><td colspan="6" class="text-center text-bold" style="padding: 30px;">Aguarde, conectando ao sistema...</td></tr>
+            </tbody>
+        </table>
+
+        <div class="summary-wrapper" id="areaResumo" style="display: none;">
+            <div class="summary-card">
+                <div class="summary-title" id="lblQtd">Total de Bilhetes</div>
+                <div class="summary-value" id="valQtd">0</div>
+            </div>
+            <div class="summary-card green">
+                <div class="summary-title" id="lblFaturamento">Faturamento Total</div>
+                <div class="summary-value green-text" id="valFaturamento">R$ 0,00</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 🚨 CONFIGURAÇÃO DO SUPABASE
+        const SUPABASE_URL = 'https://lukdkotczqindytggpvm.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1a2Rrb3RjenFpbmR5dGdncHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MzQ3NzMsImV4cCI6MjA5ODUxMDc3M30.YTx_2J0Ebr-fiXftPJqgvU90pRpkx664dKN9F2RxVjA';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let VALOR_COTA = 10.00;
+
+        const hoje = new Date();
+        document.getElementById('dataAtual').innerText = hoje.toLocaleDateString('pt-BR') + ' às ' + hoje.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+
+        async function inicializarPagina() {
+            try {
+                // Puxa as edições por ordem de criação
+                const { data: edicoesDB } = await supabase.from('gerenciador').select('nome_edicao').order('created_at', { ascending: true });
+                
+                let select = document.getElementById('edicaoSelect');
+                select.innerHTML = "";
+
+                if (!edicoesDB || edicoesDB.length === 0) {
+                    select.innerHTML = '<option value="">Nenhuma edição encontrada</option>';
+                    return;
+                }
+
+                edicoesDB.forEach(ed => {
+                    let option = document.createElement('option');
+                    option.value = ed.nome_edicao;
+                    option.text = ed.nome_edicao;
+                    select.appendChild(option);
+                });
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const edicaoNaUrl = urlParams.get('edicao');
+
+                if (edicaoNaUrl && [...select.options].some(o => o.value === edicaoNaUrl)) {
+                    select.value = edicaoNaUrl;
+                } else {
+                    select.value = edicoesDB[edicoesDB.length - 1].nome_edicao; 
+                }
+
+                carregarRelatorio(select.value);
+
+            } catch (erro) {
+                console.error(erro);
+                document.getElementById('tabelaCorpo').innerHTML = "<tr><td colspan='6' class='text-center text-bold' style='color: red;'>Erro ao carregar edições do Banco de Dados.</td></tr>";
+            }
+        }
+
+        function mudarEdicao() {
+            const select = document.getElementById('edicaoSelect');
+            const edicaoEscolhida = select.value;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('edicao', edicaoEscolhida);
+            window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+
+            document.getElementById('tabelaCorpo').innerHTML = "<tr><td colspan='6' class='text-center text-bold' style='padding: 30px;'>🔄 Mudando de edição... Aguarde.</td></tr>";
+            
+            carregarRelatorio(edicaoEscolhida);
+        }
+
+        async function carregarRelatorio(edicaoSelecionada) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tipo = urlParams.get('tipo') || 'todos';
+            
+            let tituloRelatorio = "RELATÓRIO GERAL";
+            let lblQtd = "Total de Bilhetes Listados";
+            let lblFaturamento = "Valor Total (Bruto)";
+
+            if (tipo === 'pagos') { tituloRelatorio = "RELATÓRIO DE BILHETES PAGOS"; lblQtd = "Qtd. de Bilhetes Pagos"; lblFaturamento = "Faturamento Confirmado"; }
+            else if (tipo === 'reservados') { tituloRelatorio = "RELATÓRIO DE RESERVAS PENDENTES"; lblQtd = "Qtd. de Reservas"; lblFaturamento = "Valor a Receber"; }
+            else if (tipo === 'premiados') { tituloRelatorio = "RELATÓRIO DE GANHADORES"; lblQtd = "Qtd. de Prêmios"; lblFaturamento = "Valor dos Prêmios"; }
+            else if (tipo === 'livres') { tituloRelatorio = "RELATÓRIO DE BILHETES DISPONÍVEIS"; lblQtd = "Qtd. de Bilhetes Livres"; lblFaturamento = "Faturamento Potencial"; }
+
+            document.getElementById('titulo').innerText = tituloRelatorio;
+            document.getElementById('nomeEdicaoFiltro').innerText = edicaoSelecionada;
+            document.getElementById('lblQtd').innerText = lblQtd;
+            document.getElementById('lblFaturamento').innerText = lblFaturamento;
+
+            try {
+                // 1. Busca a cota
+                const { data: config } = await supabase.from('gerenciador').select('valor_cota').eq('nome_edicao', edicaoSelecionada).limit(1);
+                VALOR_COTA = config && config.length > 0 ? parseFloat(config[0].valor_cota.toString().replace(',', '.')) : 10.00;
+                document.getElementById('valorCotaDisplay').innerText = `R$ ${VALOR_COTA.toFixed(2).replace('.', ',')}`;
+
+                // 2. Busca os bilhetes e agrupa
+                const { data: bilhetes } = await supabase.from('sorteio').select('*').eq('edicao', edicaoSelecionada).order('numero');
+                
+                let filtrados = bilhetes || [];
+                if (tipo === "pagos") { filtrados = filtrados.filter(b => b.status.toLowerCase() === 'pago' || b.status.toLowerCase() === 'premiado'); }
+                else if (tipo === "reservados") { filtrados = filtrados.filter(b => b.status.toLowerCase() === 'reservado'); }
+                else if (tipo === "premiados") { filtrados = filtrados.filter(b => b.status.toLowerCase() === 'premiado'); }
+                else if (tipo === "livres") { filtrados = filtrados.filter(b => b.status.toLowerCase() === 'livre'); }
+                else { filtrados = filtrados.filter(b => b.status.toLowerCase() !== 'livre'); }
+
+                let grupos = {};
+                filtrados.forEach(row => {
+                    let chave = row.whatsapp ? row.whatsapp.toString().trim() : "sem-numero"; 
+                    if (!grupos[chave]) { 
+                        grupos[chave] = { numeros: [row.numero], status: row.status, nome: row.nome || 'Sem Nome', whatsapp: row.whatsapp || '', data: row.data || '' }; 
+                    } else { 
+                        grupos[chave].numeros.push(row.numero); 
+                    }
+                });
+
+                let dadosAgrupados = Object.values(grupos);
+                dadosAgrupados.sort((a, b) => a.nome.localeCompare(b.nome));
+
+                let corpo = document.getElementById('tabelaCorpo');
+                corpo.innerHTML = "";
+
+                if (dadosAgrupados.length === 0) {
+                    corpo.innerHTML = "<tr><td colspan='6' class='text-center text-bold' style='padding: 20px; color: #666;'>Nenhum registro encontrado para este filtro.</td></tr>";
+                    document.getElementById('areaResumo').style.display = 'none';
+                    return;
+                }
+
+                let totalCotasReais = 0; 
+
+                dadosAgrupados.forEach(item => {
+                    let qtdCotasPessoa = item.numeros.length; 
+                    totalCotasReais += qtdCotasPessoa;
+
+                    let statusClasse = "";
+                    let st = item.status.toLowerCase();
+                    if (st === 'pago' || st === 'premiado') statusClasse = "status-pago";
+                    else if (st === 'reservado') statusClasse = "status-reservado";
+
+                    let exibicaoNumero = qtdCotasPessoa > 1 ? `${item.numeros.join(", ")} <br><small><b>(${qtdCotasPessoa} cotas)</b></small>` : item.numeros.join(", ");
+
+                    let numeroLimpo = item.whatsapp.replace(/\D/g, ''); 
+                    let mensagem = `Olá, ${item.nome}! A nova edição do Pix Premiado já está no ar. Venha garantir seus números da sorte! 🍀`;
+                    let linkWhatsapp = `https://wa.me/${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
+
+                    corpo.innerHTML += `
+                        <tr>
+                            <td class="text-center text-bold" style="font-size: 15px; line-height: 1.4;">${exibicaoNumero}</td>
+                            <td class="text-bold">${item.nome}</td>
+                            <td class="text-center">${item.whatsapp}</td>
+                            <td class="text-center" style="color: #666;">${item.data}</td>
+                            <td class="text-center ${statusClasse}">${item.status.toUpperCase()}</td>
+                            <td class="text-center col-acao">
+                                <a href="${linkWhatsapp}" target="_blank" class="btn-whats-pequeno">📲 Convidar</a>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                let faturamento = totalCotasReais * VALOR_COTA;
+                document.getElementById('valQtd').innerText = totalCotasReais;
+                document.getElementById('valFaturamento').innerText = faturamento.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('areaResumo').style.display = 'flex';
+
+            } catch (erro) {
+                document.getElementById('tabelaCorpo').innerHTML = "<tr><td colspan='6' class='text-center text-bold' style='color: red;'>Erro ao carregar dados do Banco.</td></tr>";
+            }
+        }
+
+        inicializarPagina();
+    </script>
+</body>
+</html>
