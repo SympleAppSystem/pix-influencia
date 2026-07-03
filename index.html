@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pix Influência</title>
+    <!-- Adicionando o Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* MANTIVE O SEU CSS EXATAMENTE IGUAL */
+        /* CSS INTACTO */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; color: #333; padding-bottom: 80px;} 
         * { box-sizing: border-box; }
 
@@ -143,17 +144,17 @@
     <div id="modalAviso"><div class="aviso-content"><div style="font-size: 50px;">⚠️</div><h2 style="color: #f44336; margin-top: 0;">Atenção!</h2><p id="textoAviso" style="color: #444; font-size: 16px; margin-bottom: 15px;">Mensagem de erro aqui.</p><button class="btn-aviso" onclick="fecharAviso()">Entendi</button></div></div>
 
     <script>
-        // 🚨 CONFIGURAÇÃO DO SUPABASE
+        // 🚨 CONFIGURAÇÃO DO SUPABASE (A variável de conexão agora chama-se 'banco')
         const SUPABASE_URL = 'https://lukdkotczqindytggpvm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1a2Rrb3RjenFpbmR5dGdncHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MzQ3NzMsImV4cCI6MjA5ODUxMDc3M30.YTx_2J0Ebr-fiXftPJqgvU90pRpkx664dKN9F2RxVjA';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const banco = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const SEU_WHATSAPP_ADMIN = "5575999512480"; 
         const MINHA_CHAVE_PIX = "75999512480"; 
         const NOME_RECEBEDOR = "JESSICA SOUZA DO NASCIMENTO"; 
         const BANCO_RECEBEDOR = "BANCO ITAÚ"; 
         
-        // Link gerador de imagens do AppSheet (Ajuste "NOME_DO_APP-CONTA" se necessário)
+        // Link gerador de imagens do AppSheet
         const APPSHEET_IMAGE_URL = "https://www.appsheet.com/template/gettablefileurl?appName=AppInfluencia-123456&tableName=gerenciador&fileName=";
         
         let VALOR_UNITARIO = 10.00; 
@@ -176,7 +177,6 @@
         function fecharAviso() { document.getElementById('modalAviso').style.display = 'none'; }
         function formatarMoeda(valor) { return "R$ " + parseFloat(valor).toFixed(2).replace('.', ','); }
 
-        // Traduz o link de imagem
         function converterImagem(caminho) {
             if(!caminho) return "";
             if(caminho.startsWith("http")) return caminho;
@@ -185,8 +185,8 @@
 
         async function iniciarSistema() {
             try {
-                // 1. Pega a edição ativa
-                const { data: edicoes, error: errEd } = await supabase.from('gerenciador').select('*').or('status.ilike.ativa,status.ilike.pendente').limit(1);
+                // Trocado supabase por banco
+                const { data: edicoes, error: errEd } = await banco.from('gerenciador').select('*').or('status.ilike.ativa,status.ilike.pendente').limit(1);
                 
                 if (errEd || !edicoes || edicoes.length === 0) {
                     document.getElementById('loading').innerText = "Nenhuma edição ativa no momento.";
@@ -204,14 +204,12 @@
                     document.getElementById('instrucoesTxt').style.fontSize = "22px";
                 }
 
-                // Transforma vírgula em ponto se necessário, e define o valor
                 VALOR_UNITARIO = parseFloat(config.valor_cota.toString().replace(',','.'));
                 document.getElementById('textoValorCota').innerText = formatarMoeda(VALOR_UNITARIO);
                 
                 let container = document.getElementById('prizesContainer');
                 container.innerHTML = "";
                 
-                // Constrói os cards dos prêmios
                 let premiosList = [];
                 if(config.premio_1_titulo) premiosList.push({ icone: "🥇", titulo: "1º Prêmio", nome: config.premio_1_titulo, imagem: converterImagem(config.premio_1_imagem), corClass: "ouro" });
                 if(config.premio_2_titulo) premiosList.push({ icone: "🥈", titulo: "2º Prêmio", nome: config.premio_2_titulo, imagem: converterImagem(config.premio_2_imagem), corClass: "prata" });
@@ -229,7 +227,6 @@
                     `;
                 });
 
-                // 2. Busca os bilhetes desta edição
                 carregarNumeros();
 
             } catch (erro) {
@@ -242,7 +239,8 @@
         async function carregarNumeros() {
             try {
                 document.getElementById('loading').style.display = 'block';
-                const { data: dados, error } = await supabase.from('sorteio').select('numero, status').eq('edicao', edicaoAtualNome).order('numero');
+                // Trocado supabase por banco
+                const { data: dados, error } = await banco.from('sorteio').select('numero, status').eq('edicao', edicaoAtualNome).order('numero');
                 if(error) throw error;
                 renderizarNumeros(dados || []);
             } catch (erro) {
@@ -328,8 +326,8 @@
             btn.disabled = true;
             
             try {
-                // Checa se alguém já pegou
-                const { data: verificacao } = await supabase.from('sorteio').select('numero, status').in('numero', numerosEscolhidos).eq('edicao', edicaoAtualNome);
+                // Trocado supabase por banco
+                const { data: verificacao } = await banco.from('sorteio').select('numero, status').in('numero', numerosEscolhidos).eq('edicao', edicaoAtualNome);
                 let roubados = verificacao.filter(b => b.status.toLowerCase() !== 'livre');
                 
                 if (roubados.length > 0) {
@@ -339,9 +337,9 @@
                     return;
                 }
 
-                // Efetua a reserva
                 let dataAtual = new Date().toLocaleString("pt-BR");
-                const { error: erroUpdate } = await supabase.from('sorteio').update({ status: 'Reservado', nome: nome, whatsapp: whatsapp, data: dataAtual }).in('numero', numerosEscolhidos).eq('edicao', edicaoAtualNome);
+                // Trocado supabase por banco
+                const { error: erroUpdate } = await banco.from('sorteio').update({ status: 'Reservado', nome: nome, whatsapp: whatsapp, data: dataAtual }).in('numero', numerosEscolhidos).eq('edicao', edicaoAtualNome);
 
                 if (!erroUpdate) {
                     let totalPagar = formatarMoeda(numerosEscolhidos.length * VALOR_UNITARIO);
