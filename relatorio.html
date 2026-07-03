@@ -93,7 +93,7 @@
     </div>
 
     <script>
-        // 🚨 CONFIGURAÇÃO DO SUPABASE (A variável de conexão agora chama-se 'banco')
+        // 🚨 CONFIGURAÇÃO DO SUPABASE
         const SUPABASE_URL = 'https://lukdkotczqindytggpvm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1a2Rrb3RjenFpbmR5dGdncHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MzQ3NzMsImV4cCI6MjA5ODUxMDc3M30.YTx_2J0Ebr-fiXftPJqgvU90pRpkx664dKN9F2RxVjA';
         const banco = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -105,30 +105,37 @@
 
         async function inicializarPagina() {
             try {
-                const { data: edicoesDB } = await banco.from('gerenciador').select('nome_edicao').order('created_at', { ascending: true });
+                // CORREÇÃO: Busca as edições sem exigir a coluna created_at
+                const { data: edicoesDB, error } = await banco.from('gerenciador').select('nome_edicao');
                 
+                if (error) throw error;
+
                 let select = document.getElementById('edicaoSelect');
                 select.innerHTML = "";
 
                 if (!edicoesDB || edicoesDB.length === 0) {
                     select.innerHTML = '<option value="">Nenhuma edição encontrada</option>';
+                    document.getElementById('tabelaCorpo').innerHTML = "<tr><td colspan='6' class='text-center text-bold' style='padding: 30px;'>Nenhum dado para exibir.</td></tr>";
                     return;
                 }
 
-                edicoesDB.forEach(ed => {
+                // Remove nomes duplicados e cria a lista
+                let nomesUnicos = [...new Set(edicoesDB.map(ed => ed.nome_edicao))];
+
+                nomesUnicos.forEach(nome => {
                     let option = document.createElement('option');
-                    option.value = ed.nome_edicao;
-                    option.text = ed.nome_edicao;
+                    option.value = nome;
+                    option.text = nome;
                     select.appendChild(option);
                 });
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const edicaoNaUrl = urlParams.get('edicao');
 
-                if (edicaoNaUrl && [...select.options].some(o => o.value === edicaoNaUrl)) {
+                if (edicaoNaUrl && nomesUnicos.includes(edicaoNaUrl)) {
                     select.value = edicaoNaUrl;
                 } else {
-                    select.value = edicoesDB[edicoesDB.length - 1].nome_edicao; 
+                    select.value = nomesUnicos[nomesUnicos.length - 1]; 
                 }
 
                 carregarRelatorio(select.value);
@@ -246,6 +253,30 @@
                 document.getElementById('tabelaCorpo').innerHTML = "<tr><td colspan='6' class='text-center text-bold' style='color: red;'>Erro ao carregar dados do Banco.</td></tr>";
             }
         }
+
+        // ==========================================
+        // 🚀 RADAR EM TEMPO REAL (SUPABASE REALTIME)
+        // ==========================================
+        banco.channel('monitoramento_relatorio')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'sorteio' },
+                (payload) => {
+                    // Atualiza a tabela imediatamente quando alguém compra ou paga
+                    let edicaoAtual = document.getElementById('edicaoSelect').value;
+                    if(edicaoAtual) carregarRelatorio(edicaoAtual); 
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'gerenciador' },
+                (payload) => {
+                    // Atualiza a lista de edições se criar ou apagar uma nova
+                    inicializarPagina(); 
+                }
+            )
+            .subscribe();
+        // ==========================================
 
         inicializarPagina();
     </script>
