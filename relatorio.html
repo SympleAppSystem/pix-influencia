@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Relatório - Pix Influência</title>
+    <!-- Adicionando o Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* MANTIDO O SEU CSS EXATAMENTE IGUAL */
+        /* CSS INTACTO */
         @page { size: A4 landscape; margin: 15mm; }
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; color: #333; }
         .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -92,10 +93,10 @@
     </div>
 
     <script>
-        // 🚨 CONFIGURAÇÃO DO SUPABASE
+        // 🚨 CONFIGURAÇÃO DO SUPABASE (A variável de conexão agora chama-se 'banco')
         const SUPABASE_URL = 'https://lukdkotczqindytggpvm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1a2Rrb3RjenFpbmR5dGdncHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MzQ3NzMsImV4cCI6MjA5ODUxMDc3M30.YTx_2J0Ebr-fiXftPJqgvU90pRpkx664dKN9F2RxVjA';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const banco = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let VALOR_COTA = 10.00;
 
@@ -104,8 +105,7 @@
 
         async function inicializarPagina() {
             try {
-                // Puxa as edições por ordem de criação
-                const { data: edicoesDB } = await supabase.from('gerenciador').select('nome_edicao').order('created_at', { ascending: true });
+                const { data: edicoesDB } = await banco.from('gerenciador').select('nome_edicao').order('created_at', { ascending: true });
                 
                 let select = document.getElementById('edicaoSelect');
                 select.innerHTML = "";
@@ -171,13 +171,11 @@
             document.getElementById('lblFaturamento').innerText = lblFaturamento;
 
             try {
-                // 1. Busca a cota
-                const { data: config } = await supabase.from('gerenciador').select('valor_cota').eq('nome_edicao', edicaoSelecionada).limit(1);
+                const { data: config } = await banco.from('gerenciador').select('valor_cota').eq('nome_edicao', edicaoSelecionada).limit(1);
                 VALOR_COTA = config && config.length > 0 ? parseFloat(config[0].valor_cota.toString().replace(',', '.')) : 10.00;
                 document.getElementById('valorCotaDisplay').innerText = `R$ ${VALOR_COTA.toFixed(2).replace('.', ',')}`;
 
-                // 2. Busca os bilhetes e agrupa
-                const { data: bilhetes } = await supabase.from('sorteio').select('*').eq('edicao', edicaoSelecionada).order('numero');
+                const { data: bilhetes } = await banco.from('sorteio').select('*').eq('edicao', edicaoSelecionada).order('numero');
                 
                 let filtrados = bilhetes || [];
                 if (tipo === "pagos") { filtrados = filtrados.filter(b => b.status.toLowerCase() === 'pago' || b.status.toLowerCase() === 'premiado'); }
