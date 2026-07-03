@@ -138,16 +138,19 @@
             let roleta = document.getElementById('roleta');
             let premioAtual = listaPremios[indicePremioAtual];
             
-            let ehUltimoSorteio = (indicePremioAtual + 1 === listaPremios.length);
-            
             btn.disabled = true;
             btn.innerText = "Sorteando...";
 
+            // Inicia o efeito visual de trocar os números rápido
             let intervalo = setInterval(() => { roleta.innerText = Math.floor(Math.random() * 999) + 1; }, 50);
 
             try {
+                // Busca quem pagou (isso agora acontece instantaneamente!)
                 const { data: pagos } = await banco.from('sorteio').select('*').eq('edicao', edicaoAtualNome).ilike('status', 'pago');
                 
+                // ⏱️ O SEGREDO DO SUSPENSE: Pausa dramática de 4 segundos (4000 ms) antes de parar a roleta
+                await new Promise(resolve => setTimeout(resolve, 4000));
+
                 clearInterval(intervalo);
 
                 if (!pagos || pagos.length === 0) {
@@ -158,8 +161,8 @@
                     return;
                 }
 
+                // Sorteia e salva no banco
                 let vencedor = pagos[Math.floor(Math.random() * pagos.length)];
-
                 await banco.from('sorteio').update({ status: 'Premiado' }).eq('id', vencedor.id);
 
                 roleta.innerText = vencedor.numero;
