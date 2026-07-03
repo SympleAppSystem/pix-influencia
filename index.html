@@ -379,6 +379,31 @@
             });
         }
 
+        // ==========================================
+        // 🚀 RADAR EM TEMPO REAL (SUPABASE REALTIME)
+        // ==========================================
+        banco.channel('monitoramento_ao_vivo')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'sorteio' },
+                (payload) => {
+                    // Quando alguém compra, reserva ou o AppSheet apaga um número, ele atualiza a tela de todos!
+                    console.log('Alteração detectada nos bilhetes!', payload);
+                    carregarNumeros(); 
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'gerenciador' },
+                (payload) => {
+                    // Se você fechar a edição ou criar uma nova no AppSheet, o site atualiza sozinho!
+                    console.log('Alteração detectada no Gerenciador!', payload);
+                    iniciarSistema(); 
+                }
+            )
+            .subscribe();
+        // ==========================================
+
         iniciarSistema();
     </script>
 </body>
