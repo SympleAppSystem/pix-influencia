@@ -349,15 +349,19 @@
                     document.getElementById('numSucesso').innerText = strNumeros;
                     document.getElementById('valorTotalSucesso').innerText = "Total: " + totalPagar;
                     
+                    // Link 1: Botão Verde (Comprovante)
                     let msg = `Olá! O meu nome é ${nome}. Reservei as cotas [${strNumeros}] no Pix Influência. Segue o comprovante de ${totalPagar}:`;
                     document.getElementById('linkZap').href = `https://wa.me/${SEU_WHATSAPP_ADMIN}?text=${encodeURIComponent(msg)}`;
+                    
+                    // Link 2: Texto de Suporte (Dúvidas com PIX)
+                    let msgSuporte = `Olá! O meu nome é ${nome}. Tive uma dúvida ou problema ao tentar realizar o PIX da minha reserva das cotas [${strNumeros}]. Pode me ajudar?`;
+                    document.getElementById('linkSuporte').href = `https://wa.me/${SEU_WHATSAPP_ADMIN}?text=${encodeURIComponent(msgSuporte)}`;
                     
                     numerosEscolhidos = [];
                     atualizarBarraCheckout();
                     document.getElementById('nome').value = '';
                     document.getElementById('whatsapp').value = '55';
                     
-                    // 👇 AS DUAS LINHAS ADICIONADAS AQUI PARA CORRIGIR O BUG 👇
                     btn.innerText = "Concluir Reserva";
                     btn.disabled = false;
                     
