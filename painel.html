@@ -255,14 +255,28 @@
             });
         }
 
-        banco.channel('monitor_abandonos')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'carrinhos_abandonados' }, () => { buscarOportunidades(); })
-            .subscribe();
-
-        banco.channel('monitor_reservas')
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sorteio' }, () => { buscarOportunidades(); })
-            .subscribe();
-
+        // ==========================================
+        // 🛰️ RADAR DE ATUALIZAÇÃO AUTOMÁTICA UNIFICADO
+        // ==========================================
+        
+        // Criamos um único canal (antena) e ligamos aos dois eventos
+        banco.channel('radar_painel_admin')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'carrinhos_abandonados' }, (payload) => { 
+                console.log("🔄 Radar detetou mudança no Carrinho!", payload);
+                buscarOportunidades(); 
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'sorteio' }, (payload) => { 
+                console.log("🔄 Radar detetou mudança na Reserva!", payload);
+                buscarOportunidades(); 
+            })
+            .subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    console.log("✅ Conexão em Tempo Real do Painel estabelecida com sucesso!");
+                } else {
+                    console.log("⚠️ Status da Conexão:", status);
+                }
+            });
+        // Carga inicial
         buscarOportunidades();
     </script>
 </body>
