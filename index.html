@@ -6,6 +6,7 @@
     <title>Pix Influência</title>
     <link rel="icon" type="image/png" href="https://i.postimg.cc/YqkptFRW/Design-sem-nome-(4).png">
     
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -18,15 +19,12 @@
         .header-bg h1 { margin: 10px 0 5px 0; font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;}
         .header-bg p { margin: 0 0 15px 0; font-size: 16px; opacity: 0.9; }
 
-        /* CÁPSULA DE STATUS VIP (Glassmorphism) */
+        /* CÁPSULA DE STATUS VIP */
         .user-status-bar { max-width: 440px; margin: 15px auto 0 auto; padding: 8px 16px; display: none; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 30px; font-size: 13.5px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .status-user-info { display: flex; align-items: center; gap: 8px; font-weight: 600; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; background-color: #25D366; display: inline-block; animation: pulseGreen 2s infinite; }
         @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
-        
-        /* O Crachá VIP de Cotas */
         .badge-cotas { background: #FFD700; color: #000; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 900; margin-left: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
         .status-actions-group { display: flex; align-items: center; gap: 6px; }
         .btn-status-action { background: rgba(255, 255, 255, 0.12); color: #fff; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
         .btn-status-action:hover { background: rgba(255, 255, 255, 0.22); }
@@ -45,7 +43,6 @@
         .price-card { background: white; border-radius: 15px; padding: 20px 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 300px; margin: 0 auto 15px auto; position: relative; overflow: hidden; border: 1px solid #eaeaea; }
         .card-top-green { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #4CAF50; }
         .ticket-price { font-size: 28px; font-weight: 900; color: #2E8B57; }
-        
         .urgencia-banner { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px 15px; border-radius: 10px; margin: 0 auto 30px auto; max-width: 650px; text-align: center; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 92%; }
         .urgencia-banner b { color: #d39e00; }
 
@@ -60,7 +57,7 @@
         .number-box.selecionado { background-color: #2a5298; color: white; border: 2px solid #2a5298; transform: scale(1.05); box-shadow: 0 0 15px rgba(42,82,152,0.4); }
         #loading { text-align: center; font-weight: bold; color: #2a5298; margin: 20px; font-size: 18px; }
 
-        /* BARRA DE COMPRA (INFERIOR) */
+        /* BARRA DE COMPRA INFERIOR */
         .checkout-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.2); display: none; justify-content: space-between; align-items: center; z-index: 100; border-top-left-radius: 20px; border-top-right-radius: 20px; }
         .checkout-info { font-size: 14px; font-weight: bold; color: #555; line-height: 1.2;}
         .checkout-total { color: #2E8B57; font-size: 24px; font-weight: 900; display: block; margin-top: 2px;}
@@ -71,9 +68,7 @@
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 92%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); overflow-y: auto; max-height: 90vh; }
         input { width: 100%; padding: 14px; margin: 8px 0 15px 0; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; outline: none; transition: border 0.3s; }
         .zap-dica { font-size: 13px; color: #666; text-align: left; display: block; margin: -10px 0 15px 5px; line-height: 1.4;}
-        
         .aviso-prevencao { background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 13px; border-left: 4px solid #ffc107; text-align: left; margin-bottom: 15px; }
-
         button { padding: 16px; background: #2a5298; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; margin-bottom: 12px; transition: 0.3s; }
         .close-btn { background: #f1f3f5; color: #555; }
         .valor-destaque { font-size: 26px; color: #2E8B57; font-weight: 900; margin: 15px 0; display: block; }
@@ -101,6 +96,7 @@
         <h1>PIX INFLUÊNCIA</h1>
         <p>🍀 Transformando vidas com jogos reais e pagos</p>
         
+        <!-- CÁPSULA DE STATUS VIP GLASSMORPHISM -->
         <div id="userStatusBar" class="user-status-bar">
             <div class="status-user-info">
                 <span class="status-dot"></span>
@@ -187,15 +183,14 @@
         </div>
     </div>
 
+    <!-- MODAL DE EDIÇÃO DOS DADOS DO USUÁRIO BLINDADO -->
     <div id="modalEdicao">
         <div class="modal-content">
             <h2 style="color: #2a5298; margin-top: 0;">Meus Dados</h2>
             <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Atualize suas informações de contato. Elas serão salvas para suas próximas compras.</p>
             
-            <!-- O input de nome continua livre -->
             <input type="text" id="editNome" placeholder="O seu Nome Completo">
             
-            <!-- O input do WhatsApp agora está BLOQUEADO (disabled) -->
             <label style="font-size: 12px; color: #888; text-align: left; display: block; margin-left: 5px; margin-bottom: -5px;">WhatsApp (Não pode ser alterado)</label>
             <input type="tel" id="editWhatsapp" placeholder="WhatsApp (55...)" maxlength="13" disabled style="background-color: #f1f3f5; cursor: not-allowed; color: #777;">
             
@@ -204,6 +199,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE ALERTA GERAL -->
     <div id="modalAviso">
         <div class="modal-content aviso-content">
             <div style="font-size: 50px;">⚠️</div>
@@ -230,21 +226,11 @@
         let numerosEscolhidos = [];
         let edicaoEstaAberta = true; 
         let edicaoAtualNome = "";
+        let leadSalvo = false; // VARIÁVEL DO CARRINHO ABANDONADO
 
         document.getElementById('chavePixTexto').innerText = MINHA_CHAVE_PIX;
         document.getElementById('nomePixTexto').innerText = NOME_RECEBEDOR;
         document.getElementById('bancoPixTexto').innerText = BANCO_RECEBEDOR;
-
-        function aplicarMascara(id) {
-            document.getElementById(id).addEventListener('input', function() {
-                let val = this.value.replace(/\D/g, '');
-                if (!val.startsWith('55')) { val = '55' + val.replace(/^5*/, ''); }
-                if (val.length > 13) { val = val.substring(0, 13); }
-                this.value = val;
-            });
-        }
-        aplicarMascara('whatsapp');
-        aplicarMascara('editWhatsapp');
 
         function mostrarErro(mensagem) { document.getElementById('textoAviso').innerText = mensagem; document.getElementById('modalAviso').style.display = 'flex'; }
         function formatarMoeda(valor) { return "R$ " + parseFloat(valor).toFixed(2).replace('.', ','); }
@@ -255,7 +241,57 @@
         }
 
         // ==========================================
-        // 👤 CONTROLE DE INFORMAÇÕES DE CADASTRO LOCAL (VIP STATUS)
+        // 🕵️‍♂️ O ESPIÃO SILENCIOSO (CARRINHO ABANDONADO)
+        // ==========================================
+        async function salvarLeadSilencioso() {
+            let nome = document.getElementById('nome').value.trim();
+            let whatsapp = document.getElementById('whatsapp').value.replace(/\D/g, ''); 
+
+            // Se o utilizador preencheu o nome e os 13 dígitos do WhatsApp, nós guardamos o rastro.
+            if (nome !== "" && whatsapp.length === 13 && !leadSalvo) {
+                let strNumeros = numerosEscolhidos.join(', ');
+                let total = formatarMoeda(numerosEscolhidos.length * VALOR_UNITARIO);
+                let dataAtual = new Date().toLocaleString("pt-BR");
+
+                try {
+                    await banco.from('carrinhos_abandonados').upsert({
+                        whatsapp: whatsapp,
+                        nome: nome,
+                        numeros_selecionados: strNumeros,
+                        valor: total,
+                        data_tentativa: dataAtual
+                    }, { onConflict: 'whatsapp' });
+                    
+                    leadSalvo = true; // Para não ficar a enviar ao banco a cada letra que ele digitar depois disso
+                } catch (erro) { console.log("Lead Silencioso Falhou", erro); }
+            }
+        }
+
+        // Os "Ouvidos" do Espião:
+        document.getElementById('whatsapp').addEventListener('input', function() {
+            let val = this.value.replace(/\D/g, '');
+            if (!val.startsWith('55')) { val = '55' + val.replace(/^5*/, ''); }
+            if (val.length > 13) { val = val.substring(0, 13); }
+            this.value = val;
+            salvarLeadSilencioso();
+        });
+
+        document.getElementById('nome').addEventListener('input', function() {
+            salvarLeadSilencioso();
+        });
+
+        function aplicarMascaraSimples(id) {
+            document.getElementById(id).addEventListener('input', function() {
+                let val = this.value.replace(/\D/g, '');
+                if (!val.startsWith('55')) { val = '55' + val.replace(/^5*/, ''); }
+                if (val.length > 13) { val = val.substring(0, 13); }
+                this.value = val;
+            });
+        }
+        aplicarMascaraSimples('editWhatsapp');
+
+        // ==========================================
+        // 👤 CONTROLE DE INFORMAÇÕES DE CADASTRO
         // ==========================================
         function checarStatusUsuario() {
             let nome = localStorage.getItem('user_nome');
@@ -268,7 +304,7 @@
                 document.getElementById('whatsapp').value = whatsapp;
                 
                 barra.style.display = 'flex';
-                atualizarContadorVIP(whatsapp); // Busca e exibe o crachá de cotas
+                atualizarContadorVIP(whatsapp); 
             } else {
                 barra.style.display = 'none';
                 document.getElementById('nome').value = "";
@@ -279,7 +315,6 @@
         async function atualizarContadorVIP(whatsapp) {
             if(!whatsapp || !edicaoAtualNome) return;
             try {
-                // Conta quantos números o cliente reservou/pagou na edição atual
                 const { data, error } = await banco.from('sorteio').select('id')
                     .eq('whatsapp', whatsapp).eq('edicao', edicaoAtualNome).in('status', ['Reservado', 'Pago', 'Premiado']);
                     
@@ -303,44 +338,30 @@
             document.getElementById('modalEdicao').style.display = 'flex';
         }
 
-        // A MÁGICA DA EDIÇÃO BLINDADA
         async function salvarEdicao() {
             let novoNome = document.getElementById('editNome').value.trim();
-            // Pegamos o WhatsApp que está salvo de forma segura no navegador
             let meuWhatsapp = localStorage.getItem('user_whatsapp'); 
 
-            if (!novoNome) { 
-                mostrarErro("Por favor, preencha o seu nome."); 
-                return; 
-            }
+            if (!novoNome) { mostrarErro("Por favor, preencha o seu nome."); return; }
 
-            // 1. Atualiza o NOME no perfil do cliente (Tabela usuários)
-            await banco.from('usuarios')
-                .update({ nome_completo: novoNome })
-                .eq('whatsapp', meuWhatsapp);
+            // 1. Atualiza na Tabela Usuários
+            await banco.from('usuarios').update({ nome_completo: novoNome }).eq('whatsapp', meuWhatsapp);
+            // 2. Atualiza na Tabela Sorteios
+            await banco.from('sorteio').update({ nome: novoNome }).eq('whatsapp', meuWhatsapp);
 
-            // 2. A MÁGICA RECUPERADA: Atualiza o NOME em todos os bilhetes antigos (Tabela sorteio)
-            await banco.from('sorteio')
-                .update({ nome: novoNome })
-                .eq('whatsapp', meuWhatsapp);
-
-            // 3. Atualiza o navegador e fecha o modal
             localStorage.setItem('user_nome', novoNome);
             document.getElementById('modalEdicao').style.display = 'none';
-            
-            // 4. Atualiza a tela visualmente para o cliente ver o nome novo na Barra VIP e na grelha
             checarStatusUsuario();
             carregarNumeros();
         }
 
-        // Cadastro durante a compra (Se o número já existir, ele assume a conta)
         async function registrarUsuarioCompra(nome, whatsapp) {
             try { await banco.from('usuarios').upsert({ nome_completo: nome, whatsapp: whatsapp }, { onConflict: 'whatsapp' }); } 
-            catch (erro) { console.error('Erro de sincronização de perfil:', erro); }
+            catch (erro) { console.error('Erro de perfil:', erro); }
         }
 
         // ==========================================
-        // 🎯 LÓGICA DE EXIBIÇÃO DAS NOTIFICAÇÕES REAIS
+        // 🎯 EXIBIÇÃO DE TOAST REAL
         // ==========================================
         function exibirToastReal(nome, qtd) {
             if(!edicaoEstaAberta) return;
@@ -357,7 +378,7 @@
         }
 
         // ==========================================
-        // 🎲 SISTEMA DINÂMICO DE ATUALIZAÇÃO DA RIFA
+        // 🎲 SISTEMA DINÂMICO
         // ==========================================
         async function iniciarSistema() {
             try {
@@ -475,6 +496,7 @@
             document.getElementById('numSelecionado').innerText = numerosEscolhidos.join(', ');
             document.getElementById('valorTotalModal').innerText = "Total: " + formatarMoeda(numerosEscolhidos.length * VALOR_UNITARIO);
             
+            leadSalvo = false; // Resetamos a variável para ele poder ser capturado novamente
             checarStatusUsuario();
 
             document.getElementById('telaForm').style.display = 'block';
@@ -515,7 +537,9 @@
                     let totalPagar = formatarMoeda(numerosEscolhidos.length * VALOR_UNITARIO);
                     let strNumeros = numerosEscolhidos.join(', ');
                     
-                    // Salva sessão local e no Supabase (Cria o perfil por trás dos panos)
+                    // 👉 O REMOVEDOR AUTOMÁTICO: Ele comprou de verdade, por isso apagamo-lo da lista de abandonos
+                    await banco.from('carrinhos_abandonados').delete().eq('whatsapp', whatsapp);
+
                     localStorage.setItem('user_nome', nome);
                     localStorage.setItem('user_whatsapp', whatsapp);
                     registrarUsuarioCompra(nome, whatsapp);
@@ -527,7 +551,6 @@
                     document.getElementById('numSucesso').innerText = strNumeros;
                     document.getElementById('valorTotalSucesso').innerText = "Total: " + totalPagar;
                     
-                    // Links dinâmicos
                     let msg = `Olá! O meu nome é ${nome}. Reservei as cotas [${strNumeros}] no Pix Influência. Segue o comprovante de ${totalPagar}:`;
                     document.getElementById('linkZap').href = `https://wa.me/${SEU_WHATSAPP_ADMIN}?text=${encodeURIComponent(msg)}`;
                     let msgSuporte = `Olá! O meu nome é ${nome}. Tive uma dúvida ou problema ao tentar realizar o PIX da minha reserva das cotas [${strNumeros}]. Pode me ajudar?`;
@@ -559,27 +582,18 @@
             });
         }
 
-        // ==========================================
-        // 🛰️ RADAR EM TEMPO REAL COM NOTIFICAÇÃO 100% REAL
-        // ==========================================
         let agendadorToasts = new Map();
 
         banco.channel('monitoramento_ao_vivo')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sorteio' }, (payload) => { 
                 carregarNumeros(); 
-
-                // Processa a notificação real
                 let novoStatus = payload.new.status ? payload.new.status.toLowerCase() : '';
                 let statusAntigo = payload.old.status ? payload.old.status.toLowerCase() : '';
                 
                 if ((novoStatus === 'reservado' || novoStatus === 'pago') && statusAntigo === 'livre') {
                     let nomeCliente = payload.new.nome ? payload.new.nome : 'Alguém';
-                    
-                    if (agendadorToasts.has(nomeCliente)) {
-                        agendadorToasts.set(nomeCliente, agendadorToasts.get(nomeCliente) + 1);
-                    } else {
-                        agendadorToasts.set(nomeCliente, 1);
-                    }
+                    if (agendadorToasts.has(nomeCliente)) { agendadorToasts.set(nomeCliente, agendadorToasts.get(nomeCliente) + 1); } 
+                    else { agendadorToasts.set(nomeCliente, 1); }
 
                     setTimeout(() => {
                         if (agendadorToasts.has(nomeCliente)) {
@@ -593,7 +607,6 @@
             .on('postgres_changes', { event: '*', schema: 'public', table: 'gerenciador' }, () => { iniciarSistema(); })
             .subscribe();
 
-        // INICIALIZAÇÃO DA SESSÃO
         checarStatusUsuario();
         iniciarSistema();
     </script>
