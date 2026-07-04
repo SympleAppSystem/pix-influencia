@@ -5,90 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pix Influência</title>
     <link rel="icon" type="image/png" href="https://i.postimg.cc/8z9V3G6v/Design-sem-nome-(4).png">
-    <!-- Adicionando o Supabase -->
+    
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        /* CSS INTACTO */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; color: #333; padding-bottom: 80px;} 
         * { box-sizing: border-box; }
 
-        .header-bg { background-color: #000; color: white; text-align: center; padding: 40px 20px 80px 20px; border-bottom-left-radius: 50px; border-bottom-right-radius: 50px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        /* HEADER & IDENTIDADE VISUAL */
+        .header-bg { background-color: #000; color: white; text-align: center; padding: 40px 20px 60px 20px; border-bottom-left-radius: 50px; border-bottom-right-radius: 50px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #FFD700; object-fit: cover; margin-bottom: 10px; background-color: #000; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
         .header-bg h1 { margin: 10px 0 5px 0; font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;}
         .header-bg p { margin: 0; font-size: 16px; opacity: 0.9; }
 
-        .prizes-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 900px; margin: -50px auto 20px auto; padding: 0 15px; }
+        /* BARRA DE STATUS VIP */
+        .user-status-bar { max-width: 900px; margin: -25px auto 30px auto; padding: 12px 20px; display: none; justify-content: space-between; align-items: center; background: white; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-left: 6px solid #2a5298; font-size: 14px; position: relative; z-index: 10; }
+        .status-user-info { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #333; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; background-color: #25D366; display: inline-block; animation: pulseGreen 2s infinite; }
+        @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+        .btn-status-action { background: #f0f4f8; color: #2a5298; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-status-action:hover { background: #e0e8f5; }
+
+        /* VITRINE DE PRÊMIOS */
+        .prizes-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 900px; margin: -30px auto 20px auto; padding: 0 15px; }
         .prize-card { background: white; border-radius: 15px; padding: 20px 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); position: relative; overflow: hidden; border: 1px solid #eaeaea; flex: 1; min-width: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.3s;}
-        
         .top-ouro { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #FFD700, #FFA500); }
         .top-prata { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #C0C0C0, #808080); }
         .top-bronze { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #cd7f32, #8b4513); }
-
         .prize-badge { font-size: 13px; font-weight: bold; color: #777; text-transform: uppercase; margin-bottom: 8px; display: block;}
         .prize-name { font-size: 20px; font-weight: 900; color: #2a5298; margin-bottom: 10px;}
         .prize-img { width: 120px; height: auto; object-fit: contain; margin-top: 10px; border-radius: 8px;}
 
-        .price-card { background: white; border-radius: 15px; padding: 20px 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 300px; margin: 0 auto 30px auto; position: relative; overflow: hidden; border: 1px solid #eaeaea; }
+        /* PREÇO E URGÊNCIA (Dica 01) */
+        .price-card { background: white; border-radius: 15px; padding: 20px 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 300px; margin: 0 auto 15px auto; position: relative; overflow: hidden; border: 1px solid #eaeaea; }
         .card-top-green { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #4CAF50; }
         .ticket-price { font-size: 28px; font-weight: 900; color: #2E8B57; }
-
-        .instrucoes { text-align: center; margin: 30px 0 20px 0; font-size: 18px; font-weight: bold; color: #444; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(55px, 1fr)); gap: 10px; max-width: 650px; margin: 0 auto 50px auto; padding: 0 15px; }
         
+        .urgencia-banner { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px 15px; border-radius: 10px; margin: 0 auto 30px auto; max-width: 650px; text-align: center; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 92%; }
+        .urgencia-banner b { color: #d39e00; }
+
+        /* GRID E BOTÕES */
+        .instrucoes { text-align: center; margin: 10px 0 20px 0; font-size: 18px; font-weight: bold; color: #444; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(55px, 1fr)); gap: 10px; max-width: 650px; margin: 0 auto 50px auto; padding: 0 15px; }
         .number-box { padding: 15px 0; font-size: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.08); transition: all 0.2s ease; }
         .number-box:active { transform: scale(0.95); }
-        
         .number-box.livre { background-color: #ffffff; color: #2E8B57; border: 2px solid #2E8B57; }
         .number-box.reservado { background-color: #ffc107; color: #333; border: 2px solid #ffc107; cursor: not-allowed; }
         .number-box.pago { background-color: #f44336; color: white; border: 2px solid #f44336; cursor: not-allowed; opacity: 0.8; }
         .number-box.selecionado { background-color: #2a5298; color: white; border: 2px solid #2a5298; transform: scale(1.05); box-shadow: 0 0 15px rgba(42,82,152,0.4); }
-
         #loading { text-align: center; font-weight: bold; color: #2a5298; margin: 20px; font-size: 18px; }
 
+        /* BARRA DE CHECKOUT */
         .checkout-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.2); display: none; justify-content: space-between; align-items: center; z-index: 100; border-top-left-radius: 20px; border-top-right-radius: 20px; }
         .checkout-info { font-size: 14px; font-weight: bold; color: #555; line-height: 1.2;}
         .checkout-total { color: #2E8B57; font-size: 24px; font-weight: 900; display: block; margin-top: 2px;}
         .checkout-btn { background: linear-gradient(90deg, #2E8B57, #267347); color: white; border: none; padding: 15px 25px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(46,139,87,0.3); transition: 0.3s;}
 
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(5px); }
+        /* MODAIS */
+        #modal, #modalEdicao, #modalAviso { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 92%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); overflow-y: auto; max-height: 90vh; }
-        
         input { width: 100%; padding: 14px; margin: 8px 0 15px 0; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; outline: none; transition: border 0.3s; }
         .zap-dica { font-size: 13px; color: #666; text-align: left; display: block; margin: -10px 0 15px 5px; line-height: 1.4;}
-        
         button { padding: 16px; background: #2a5298; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; margin-bottom: 12px; transition: 0.3s; }
         .close-btn { background: #f1f3f5; color: #555; }
-        
         .valor-destaque { font-size: 26px; color: #2E8B57; font-weight: 900; margin: 15px 0; display: block; }
         .numeros-lista { color: #2a5298; font-size: 18px; word-break: break-word; margin-bottom: 10px; display: block; font-weight: bold;}
-
         .pix-box { background: #f8f9fa; border: 2px dashed #2a5298; border-radius: 12px; padding: 20px; margin: 20px 0; }
         .pix-chave { font-size: 18px; font-weight: bold; color: #333; word-break: break-all; margin-bottom: 5px; display: block; letter-spacing: 1px;}
         .copy-btn { background: #FFD700; color: #000; padding: 12px; font-size: 15px; border-radius: 8px; cursor: pointer; border: none; width: auto; display: inline-block; font-weight: bold; }
         .whatsapp-btn { background-color: #25D366; color: white; display: flex; align-items: center; justify-content: center; text-decoration: none; padding: 16px; border-radius: 10px; font-weight: bold; font-size: 18px; margin-top: 10px; transition: 0.3s; }
         .suporte-link { display: block; margin-top: 15px; margin-bottom: 5px; color: #666; font-size: 14px; text-decoration: underline; cursor: pointer;}
         .success-icon { font-size: 60px; color: #5cb85c; margin-bottom: 10px; }
-
-        #modalAviso { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; }
-        .aviso-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; border-top: 5px solid #f44336; }
+        .aviso-content { border-top: 5px solid #f44336; }
         .btn-aviso { background: #f44336; color: white; margin-top: 15px; }
 
-        /* ===== Identificação do Usuário (pop-up de boas-vindas / login) ===== */
-        #modalIdentificacao { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1500; backdrop-filter: blur(6px); }
-        #modalIdentificacao .modal-content { animation: idPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes idPopIn { from { opacity: 0; transform: scale(0.85) translateY(15px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
-        .id-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2a5298, #16305a); display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 14px auto; box-shadow: 0 8px 18px rgba(42,82,152,0.4); }
-        .id-titulo { margin: 0 0 4px 0; color: #1e3c72; font-size: 21px; font-weight: 900; }
-        .id-subtitulo { color: #888; font-size: 14px; margin: 0 0 18px 0; }
-
-        .id-dado-card { background: #f8f9fa; border: 1px solid #eaeaea; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
-        .id-label { font-size: 11px; color: #999; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
-        .id-valor { font-size: 15px; color: #2a5298; font-weight: 900; text-align: right; }
-
-        .btn-confirmar-id { background: linear-gradient(90deg, #2E8B57, #267347); margin-top: 16px; box-shadow: 0 4px 10px rgba(46,139,87,0.3); }
-
-        #boasVindasBadge { display: none; background: rgba(255,255,255,0.15); color: #FFD700; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-top: 10px; border: 1px solid rgba(255,215,0,0.3); }
+        /* PROVA SOCIAL (Dica 02) */
+        .toast-container { position: fixed; bottom: 90px; left: 15px; z-index: 90; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: rgba(255, 255, 255, 0.95); color: #333; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 4px solid #25D366; animation: slideInLeft 0.5s, fadeOut 0.5s 4.5s forwards; display: flex; align-items: center; gap: 10px; max-width: 250px; }
+        @keyframes slideInLeft { from { transform: translateX(-120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
     </style>
 </head>
 <body>
@@ -97,7 +93,18 @@
         <img src="https://i.postimg.cc/YqkptFRW/Design-sem-nome-(4).png" alt="Logótipo" class="logo">
         <h1>PIX INFLUÊNCIA</h1>
         <p>🍀 Transformando vidas com jogos reais e pagos</p>
-        <span id="boasVindasBadge"></span>
+    </div>
+
+    <!-- BARRA DE STATUS VIP -->
+    <div id="userStatusBar" class="user-status-bar">
+        <div class="status-user-info">
+            <span class="status-dot"></span>
+            <span>Olá, <b id="statusNome"></b>! <span id="statusZap" style="color: #666; font-size: 13px; font-weight: normal; margin-left: 5px;"></span></span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-status-action" onclick="abrirModalEdicao()">✏️ Meus Dados</button>
+            <button class="btn-status-action" onclick="desconectarUsuario()" style="color: #f44336; background: #ffebee;" title="Sair">🚪</button>
+        </div>
     </div>
 
     <div class="prizes-container" id="prizesContainer"></div>
@@ -109,11 +116,17 @@
         <p style="font-size: 12px; color: #888; margin-top: 5px;">Apenas números pagos concorrem.</p>
     </div>
 
+    <!-- GATILHO DE ESCASSEZ -->
+    <div class="urgencia-banner">
+        ⏳ <b>Atenção:</b> Reservas não pagas em <b>30 minutos</b> serão canceladas e voltarão a ficar disponíveis.
+    </div>
+
     <div class="instrucoes" id="instrucoesTxt">👇 Escolha os seus números da sorte 👇</div>
     <p id="loading">A carregar o sistema...</p>
     
     <div class="grid" id="grid"></div>
 
+    <!-- BARRA DE CHECKOUT -->
     <div id="checkoutBar" class="checkout-bar">
         <div class="checkout-info">
             <span id="qtdCheckout">0</span> cotas selecionadas<br>
@@ -122,15 +135,21 @@
         <button class="checkout-btn" onclick="abrirModalCompra()">Reservar Agora ➔</button>
     </div>
 
+    <!-- CONTAINER DA PROVA SOCIAL -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- MODAL DE COMPRA -->
     <div id="modal">
         <div class="modal-content">
             <div id="telaForm">
                 <span style="font-size: 14px; color: #666; font-weight: bold;">Números Escolhidos:</span>
                 <div class="numeros-lista" id="numSelecionado"></div>
                 <span class="valor-destaque" id="valorTotalModal">Total: R$ 0,00</span>
+                
                 <input type="text" id="nome" placeholder="O seu Nome Completo">
                 <input type="tel" id="whatsapp" value="55" placeholder="Ex: 5511999999999" maxlength="13">
                 <span class="zap-dica">💡 <b>Dica:</b> O <b>55</b> já está aí. Adicione o DDD + o dígito 9 + o seu número!</span>
+                
                 <button onclick="confirmarReserva()" id="btnReservar">Concluir Reserva</button>
                 <button class="close-btn" onclick="fecharModal()">Voltar aos números</button>
             </div>
@@ -155,44 +174,37 @@
                 
                 <a href="#" id="linkZap" target="_blank" class="whatsapp-btn">📱 Enviar Comprovante no WhatsApp</a>
                 <a href="#" id="linkSuporte" target="_blank" class="suporte-link">Dúvidas ou problemas com o PIX? Fale connosco.</a>
-                <button class="close-btn" onclick="fecharModal(true)" style="margin-top: 10px;">Fechar</button>
+                <button class="close-btn" onclick="fecharModal(true)" style="margin-top: 10px;">Fechar e Ver Números</button>
             </div>
         </div>
     </div>
 
-    <div id="modalAviso"><div class="aviso-content"><div style="font-size: 50px;">⚠️</div><h2 style="color: #f44336; margin-top: 0;">Atenção!</h2><p id="textoAviso" style="color: #444; font-size: 16px; margin-bottom: 15px;">Mensagem de erro aqui.</p><button class="btn-aviso" onclick="fecharAviso()">Entendi</button></div></div>
-
-    <div id="modalIdentificacao">
+    <!-- MODAL DE EDIÇÃO DE DADOS -->
+    <div id="modalEdicao">
         <div class="modal-content">
-            <div id="idViewConfirmar">
-                <div class="id-avatar">👋</div>
-                <h2 class="id-titulo">Bem-vindo de volta!</h2>
-                <p class="id-subtitulo">Confirme se estes ainda são os seus dados:</p>
-                <div class="id-dado-card">
-                    <span class="id-label">Nome</span>
-                    <span class="id-valor" id="idNomeConfirma"></span>
-                </div>
-                <div class="id-dado-card">
-                    <span class="id-label">WhatsApp</span>
-                    <span class="id-valor" id="idZapConfirma"></span>
-                </div>
-                <button class="btn-confirmar-id" onclick="confirmarIdentidade()">✅ Sim, sou eu!</button>
-                <span class="suporte-link" onclick="abrirEdicaoIdentidade()">✏️ Não sou eu, corrigir dados</span>
-            </div>
-            <div id="idViewEditar" style="display:none;">
-                <div class="id-avatar">✏️</div>
-                <h2 class="id-titulo">Atualizar dados</h2>
-                <p class="id-subtitulo">Corrija as suas informações abaixo:</p>
-                <input type="text" id="idNomeInput" placeholder="O seu Nome Completo">
-                <input type="tel" id="idZapInput" value="55" placeholder="Ex: 5511999999999" maxlength="13">
-                <span class="zap-dica">💡 <b>Dica:</b> O <b>55</b> já está aí. Adicione o DDD + o dígito 9 + o seu número!</span>
-                <button onclick="salvarEdicaoIdentidade()">💾 Salvar e continuar</button>
-            </div>
+            <h2 style="color: #2a5298; margin-top: 0;">Meus Dados</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Atualize suas informações. Elas serão salvas automaticamente para suas próximas compras.</p>
+            
+            <input type="text" id="editNome" placeholder="O seu Nome Completo">
+            <input type="tel" id="editWhatsapp" value="55" placeholder="Ex: 5511999999999" maxlength="13">
+            
+            <button onclick="salvarEdicao()" style="background: #2E8B57;">Salvar Alterações</button>
+            <button class="close-btn" onclick="document.getElementById('modalEdicao').style.display = 'none'">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE AVISO / ERRO -->
+    <div id="modalAviso">
+        <div class="modal-content aviso-content">
+            <div style="font-size: 50px;">⚠️</div>
+            <h2 style="color: #f44336; margin-top: 0;">Atenção!</h2>
+            <p id="textoAviso" style="color: #444; font-size: 16px; margin-bottom: 15px;">Mensagem de erro aqui.</p>
+            <button class="btn-aviso" onclick="document.getElementById('modalAviso').style.display='none'">Entendi</button>
         </div>
     </div>
 
     <script>
-        // 🚨 CONFIGURAÇÃO DO SUPABASE (A variável de conexão agora chama-se 'banco')
+        // 🚨 CONFIGURAÇÃO DO SUPABASE
         const SUPABASE_URL = 'https://lukdkotczqindytggpvm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1a2Rrb3RjenFpbmR5dGdncHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MzQ3NzMsImV4cCI6MjA5ODUxMDc3M30.YTx_2J0Ebr-fiXftPJqgvU90pRpkx664dKN9F2RxVjA';
         const banco = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -201,8 +213,6 @@
         const MINHA_CHAVE_PIX = "75999512480"; 
         const NOME_RECEBEDOR = "JESSICA SOUZA DO NASCIMENTO"; 
         const BANCO_RECEBEDOR = "BANCO ITAÚ"; 
-        
-        // Link gerador de imagens do AppSheet
         const APPSHEET_IMAGE_URL = "https://www.appsheet.com/template/gettablefileurl?appName=PixInfu%C3%AAncia-552440234&tableName=gerenciador&fileName=";
         
         let VALOR_UNITARIO = 10.00; 
@@ -210,121 +220,122 @@
         let edicaoEstaAberta = true; 
         let edicaoAtualNome = "";
 
-        // 👤 Identificação do usuário (cadastro tipo "login")
-        const CHAVE_USUARIO_LOCAL = 'pixInfluencia_usuario';
-        let usuarioAtual = null;
-
         document.getElementById('chavePixTexto').innerText = MINHA_CHAVE_PIX;
         document.getElementById('nomePixTexto').innerText = NOME_RECEBEDOR;
         document.getElementById('bancoPixTexto').innerText = BANCO_RECEBEDOR;
 
-        function aplicarMascaraWhatsapp(input) {
-            input.addEventListener('input', function() {
+        function aplicarMascara(id) {
+            document.getElementById(id).addEventListener('input', function() {
                 let val = this.value.replace(/\D/g, '');
                 if (!val.startsWith('55')) { val = '55' + val.replace(/^5*/, ''); }
                 if (val.length > 13) { val = val.substring(0, 13); }
                 this.value = val;
             });
         }
-        aplicarMascaraWhatsapp(document.getElementById('whatsapp'));
-        aplicarMascaraWhatsapp(document.getElementById('idZapInput'));
+        aplicarMascara('whatsapp');
+        aplicarMascara('editWhatsapp');
 
         function mostrarErro(mensagem) { document.getElementById('textoAviso').innerText = mensagem; document.getElementById('modalAviso').style.display = 'flex'; }
-        function fecharAviso() { document.getElementById('modalAviso').style.display = 'none'; }
         function formatarMoeda(valor) { return "R$ " + parseFloat(valor).toFixed(2).replace('.', ','); }
-
-        // ==========================================
-        // 👤 IDENTIFICAÇÃO DO USUÁRIO (CADASTRO TIPO LOGIN)
-        // ==========================================
-        function carregarUsuarioLocal() {
-            try {
-                let salvo = localStorage.getItem(CHAVE_USUARIO_LOCAL);
-                return salvo ? JSON.parse(salvo) : null;
-            } catch (e) { return null; }
-        }
-
-        function salvarUsuarioLocal(nome, whatsapp) {
-            try {
-                localStorage.setItem(CHAVE_USUARIO_LOCAL, JSON.stringify({ nome, whatsapp }));
-            } catch (e) { console.error('Não foi possível salvar o usuário localmente:', e); }
-        }
-
-        // Cadastra (ou atualiza) o usuário na tabela "usuarios" do Supabase, por baixo dos panos.
-        // Roda em segundo plano: se falhar, não interrompe a reserva do utilizador.
-        async function registrarUsuarioSupabase(nome, whatsapp) {
-            try {
-                await banco.from('usuarios').upsert(
-                    { nome_completo: nome, whatsapp: whatsapp },
-                    { onConflict: 'whatsapp' }
-                );
-            } catch (erro) {
-                console.error('Não foi possível registar o usuário na tabela usuarios:', erro);
-            }
-        }
-
-        function mostrarBadgeBoasVindas(nome) {
-            let badge = document.getElementById('boasVindasBadge');
-            if (!badge) return;
-            let primeiroNome = nome.trim().split(' ')[0];
-            badge.innerText = `👋 Olá, ${primeiroNome}!`;
-            badge.style.display = 'inline-block';
-        }
-
-        // Ao entrar no site: se já existirem dados guardados neste dispositivo, pede confirmação.
-        function verificarUsuarioAoEntrar() {
-            let salvo = carregarUsuarioLocal();
-            if (salvo && salvo.nome && salvo.whatsapp) {
-                document.getElementById('idNomeConfirma').innerText = salvo.nome;
-                document.getElementById('idZapConfirma').innerText = salvo.whatsapp;
-                document.getElementById('idViewConfirmar').style.display = 'block';
-                document.getElementById('idViewEditar').style.display = 'none';
-                setTimeout(() => { document.getElementById('modalIdentificacao').style.display = 'flex'; }, 700);
-            }
-        }
-
-        function confirmarIdentidade() {
-            let salvo = carregarUsuarioLocal();
-            if (!salvo) return;
-            usuarioAtual = salvo;
-            document.getElementById('modalIdentificacao').style.display = 'none';
-            mostrarBadgeBoasVindas(salvo.nome);
-        }
-
-        function abrirEdicaoIdentidade() {
-            let salvo = carregarUsuarioLocal();
-            document.getElementById('idNomeInput').value = salvo ? salvo.nome : '';
-            document.getElementById('idZapInput').value = salvo ? salvo.whatsapp : '55';
-            document.getElementById('idViewConfirmar').style.display = 'none';
-            document.getElementById('idViewEditar').style.display = 'block';
-        }
-
-        async function salvarEdicaoIdentidade() {
-            let nome = document.getElementById('idNomeInput').value.trim();
-            let whatsapp = document.getElementById('idZapInput').value.trim();
-
-            if (!nome || whatsapp.length !== 13) {
-                mostrarErro("Preencha o nome e os 13 números do WhatsApp (55 + DDD + 9 + Número).");
-                return;
-            }
-
-            salvarUsuarioLocal(nome, whatsapp);
-            usuarioAtual = { nome, whatsapp };
-            await registrarUsuarioSupabase(nome, whatsapp);
-
-            document.getElementById('modalIdentificacao').style.display = 'none';
-            mostrarBadgeBoasVindas(nome);
-        }
-        // ==========================================
-
         function converterImagem(caminho) {
             if(!caminho) return "";
             if(caminho.startsWith("http")) return caminho;
             return APPSHEET_IMAGE_URL + encodeURIComponent(caminho);
         }
 
+        // ==========================================
+        // 🚀 PROVA SOCIAL (SIMULADOR DE VENDAS)
+        // ==========================================
+        const nomesProvaSocial = ["Ana C.", "Carlos M.", "Pedro H.", "Maria S.", "João P.", "Lucas T.", "Juliana F.", "Marcos R.", "Fernanda A.", "Rafael D.", "Aline V.", "Bruno K."];
+        
+        function dispararProvaSocial() {
+            if(!edicaoEstaAberta) return; // Não dispara se o sorteio já ocorreu
+
+            let container = document.getElementById('toastContainer');
+            let nome = nomesProvaSocial[Math.floor(Math.random() * nomesProvaSocial.length)];
+            let qtd = Math.floor(Math.random() * 6) + 2; // Simula entre 2 e 7 cotas
+            
+            let toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span style="font-size:18px;">🛒</span> <span><b>${nome}</b> acabou de reservar ${qtd} cotas!</span>`;
+            
+            container.appendChild(toast);
+            
+            // Apaga do HTML depois de 5 segundos
+            setTimeout(() => { toast.remove(); }, 5000);
+            
+            // Programa a próxima notificação (aleatório entre 8 a 18 segundos)
+            let proximoTempo = Math.floor(Math.random() * 10000) + 8000;
+            setTimeout(dispararProvaSocial, proximoTempo);
+        }
+        
+        // Inicia a prova social 4 segundos após a página carregar
+        setTimeout(dispararProvaSocial, 4000);
+
+        // ==========================================
+        // 👤 GESTÃO DO USUÁRIO
+        // ==========================================
+        function checarStatusUsuario() {
+            let nome = localStorage.getItem('user_nome');
+            let whatsapp = localStorage.getItem('user_whatsapp');
+            let barra = document.getElementById('userStatusBar');
+
+            if (nome && whatsapp) {
+                let ddd = whatsapp.substring(2, 4);
+                let num = whatsapp.substring(4);
+                let formatado = `(${ddd}) ${num.substring(0, 5)}-****`;
+                
+                document.getElementById('statusNome').innerText = nome.split(' ')[0];
+                document.getElementById('statusZap').innerText = formatado;
+                
+                document.getElementById('nome').value = nome;
+                document.getElementById('whatsapp').value = whatsapp;
+                
+                barra.style.display = 'flex';
+            } else {
+                barra.style.display = 'none';
+                document.getElementById('nome').value = "";
+                document.getElementById('whatsapp').value = "55";
+            }
+        }
+
+        function desconectarUsuario() {
+            localStorage.removeItem('user_nome');
+            localStorage.removeItem('user_whatsapp');
+            checarStatusUsuario();
+        }
+
+        function abrirModalEdicao() {
+            document.getElementById('editNome').value = localStorage.getItem('user_nome') || "";
+            document.getElementById('editWhatsapp').value = localStorage.getItem('user_whatsapp') || "55";
+            document.getElementById('modalEdicao').style.display = 'flex';
+        }
+
+        async function salvarEdicao() {
+            let nome = document.getElementById('editNome').value.trim();
+            let whatsapp = document.getElementById('editWhatsapp').value.trim();
+
+            if (!nome || whatsapp.length !== 13) { mostrarErro("Preencha o nome e os 13 números do WhatsApp."); return; }
+
+            localStorage.setItem('user_nome', nome);
+            localStorage.setItem('user_whatsapp', whatsapp);
+            await registrarUsuarioSupabase(nome, whatsapp);
+            
+            document.getElementById('modalEdicao').style.display = 'none';
+            checarStatusUsuario();
+        }
+
+        async function registrarUsuarioSupabase(nome, whatsapp) {
+            try {
+                await banco.from('usuarios').upsert({ nome_completo: nome, whatsapp: whatsapp }, { onConflict: 'whatsapp' });
+            } catch (erro) { console.error('Erro:', erro); }
+        }
+
+        // ==========================================
+        // 🎲 SISTEMA DA RIFA
+        // ==========================================
         async function iniciarSistema() {
             try {
-                // Trocado supabase por banco
                 const { data: edicoes, error: errEd } = await banco.from('gerenciador').select('*').or('status.ilike.ativa,status.ilike.pendente').limit(1);
                 
                 if (errEd || !edicoes || edicoes.length === 0) {
@@ -367,9 +378,7 @@
                 });
 
                 carregarNumeros();
-
             } catch (erro) {
-                console.error(erro);
                 document.getElementById('loading').innerText = "⚠️ Erro de conexão com o Banco de Dados.";
                 document.getElementById('loading').style.color = "#f44336";
             }
@@ -378,7 +387,6 @@
         async function carregarNumeros() {
             try {
                 document.getElementById('loading').style.display = 'block';
-                // Trocado supabase por banco
                 const { data: dados, error } = await banco.from('sorteio').select('numero, status').eq('edicao', edicaoAtualNome).order('numero');
                 if(error) throw error;
                 renderizarNumeros(dados || []);
@@ -407,13 +415,8 @@
                 div.innerText = item.numero;
                 
                 if (statusClasse === 'livre') {
-                    if (edicaoEstaAberta) {
-                        div.onclick = function() { toggleNumero(item.numero, this); };
-                    } else {
-                        div.style.opacity = '0.5';
-                        div.style.cursor = 'not-allowed';
-                        div.title = 'Sorteio Realizado';
-                    }
+                    if (edicaoEstaAberta) { div.onclick = function() { toggleNumero(item.numero, this); }; } 
+                    else { div.style.opacity = '0.5'; div.style.cursor = 'not-allowed'; div.title = 'Sorteio Realizado'; }
                 }
                 grid.appendChild(div);
             });
@@ -442,14 +445,11 @@
         function abrirModalCompra() {
             if(numerosEscolhidos.length === 0) return;
             numerosEscolhidos.sort((a,b) => a - b);
+            
             document.getElementById('numSelecionado').innerText = numerosEscolhidos.join(', ');
             document.getElementById('valorTotalModal').innerText = "Total: " + formatarMoeda(numerosEscolhidos.length * VALOR_UNITARIO);
-
-            // Se o usuário já está identificado, pré-preenche os seus dados
-            if (usuarioAtual) {
-                document.getElementById('nome').value = usuarioAtual.nome;
-                document.getElementById('whatsapp').value = usuarioAtual.whatsapp;
-            }
+            
+            checarStatusUsuario();
 
             document.getElementById('telaForm').style.display = 'block';
             document.getElementById('telaSucesso').style.display = 'none';
@@ -486,33 +486,28 @@
                 const { error: erroUpdate } = await banco.from('sorteio').update({ status: 'Reservado', nome: nome, whatsapp: whatsapp, data: dataAtual }).in('numero', numerosEscolhidos).eq('edicao', edicaoAtualNome);
 
                 if (!erroUpdate) {
-                    // 🚀 Cadastra/atualiza o usuário na tabela "usuarios" por baixo dos panos (tipo login)
-                    registrarUsuarioSupabase(nome, whatsapp);
-                    salvarUsuarioLocal(nome, whatsapp);
-                    usuarioAtual = { nome, whatsapp };
-                    mostrarBadgeBoasVindas(nome);
-
                     let totalPagar = formatarMoeda(numerosEscolhidos.length * VALOR_UNITARIO);
                     let strNumeros = numerosEscolhidos.join(', ');
                     
+                    localStorage.setItem('user_nome', nome);
+                    localStorage.setItem('user_whatsapp', whatsapp);
+                    registrarUsuarioSupabase(nome, whatsapp);
+                    checarStatusUsuario(); 
+                    
                     document.getElementById('telaForm').style.display = 'none';
                     document.getElementById('telaSucesso').style.display = 'block';
-                    document.getElementById('nomeSucesso').innerText = nome;
+                    document.getElementById('nomeSucesso').innerText = nome.split(' ')[0];
                     document.getElementById('numSucesso').innerText = strNumeros;
                     document.getElementById('valorTotalSucesso').innerText = "Total: " + totalPagar;
                     
-                    // Link 1: Botão Verde (Comprovante)
                     let msg = `Olá! O meu nome é ${nome}. Reservei as cotas [${strNumeros}] no Pix Influência. Segue o comprovante de ${totalPagar}:`;
                     document.getElementById('linkZap').href = `https://wa.me/${SEU_WHATSAPP_ADMIN}?text=${encodeURIComponent(msg)}`;
                     
-                    // Link 2: Texto de Suporte (Dúvidas com PIX)
                     let msgSuporte = `Olá! O meu nome é ${nome}. Tive uma dúvida ou problema ao tentar realizar o PIX da minha reserva das cotas [${strNumeros}]. Pode me ajudar?`;
                     document.getElementById('linkSuporte').href = `https://wa.me/${SEU_WHATSAPP_ADMIN}?text=${encodeURIComponent(msgSuporte)}`;
                     
                     numerosEscolhidos = [];
                     atualizarBarraCheckout();
-                    document.getElementById('nome').value = '';
-                    document.getElementById('whatsapp').value = '55';
                     
                     btn.innerText = "Concluir Reserva";
                     btn.disabled = false;
@@ -538,33 +533,13 @@
             });
         }
 
-        // ==========================================
-        // 🚀 RADAR EM TEMPO REAL (SUPABASE REALTIME)
-        // ==========================================
         banco.channel('monitoramento_ao_vivo')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'sorteio' },
-                (payload) => {
-                    // Quando alguém compra, reserva ou o AppSheet apaga um número, ele atualiza a tela de todos!
-                    console.log('Alteração detectada nos bilhetes!', payload);
-                    carregarNumeros(); 
-                }
-            )
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'gerenciador' },
-                (payload) => {
-                    // Se você fechar a edição ou criar uma nova no AppSheet, o site atualiza sozinho!
-                    console.log('Alteração detectada no Gerenciador!', payload);
-                    iniciarSistema(); 
-                }
-            )
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'sorteio' }, () => { carregarNumeros(); })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'gerenciador' }, () => { iniciarSistema(); })
             .subscribe();
-        // ==========================================
 
+        checarStatusUsuario();
         iniciarSistema();
-        verificarUsuarioAoEntrar();
     </script>
 </body>
 </html>
