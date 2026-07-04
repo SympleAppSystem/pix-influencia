@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pix Influência</title>
-    <link rel="icon" type="image/png" href="https://i.postimg.cc/8z9V3G6v/Design-sem-nome-(4).png">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/YqkptFRW/Design-sem-nome-(4).png">
     
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -17,18 +16,20 @@
         .header-bg { background-color: #000; color: white; text-align: center; padding: 40px 20px 60px 20px; border-bottom-left-radius: 50px; border-bottom-right-radius: 50px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #FFD700; object-fit: cover; margin-bottom: 10px; background-color: #000; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
         .header-bg h1 { margin: 10px 0 5px 0; font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;}
-        .header-bg p { margin: 0; font-size: 16px; opacity: 0.9; }
+        .header-bg p { margin: 0 0 15px 0; font-size: 16px; opacity: 0.9; }
 
-        /* BARRA DE STATUS VIP */
-        .user-status-bar { max-width: 900px; margin: -25px auto 30px auto; padding: 12px 20px; display: none; justify-content: space-between; align-items: center; background: white; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-left: 6px solid #2a5298; font-size: 14px; position: relative; z-index: 10; }
-        .status-user-info { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #333; }
-        .status-dot { width: 12px; height: 12px; border-radius: 50%; background-color: #25D366; display: inline-block; animation: pulseGreen 2s infinite; }
-        @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
-        .btn-status-action { background: #f0f4f8; color: #2a5298; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-status-action:hover { background: #e0e8f5; }
+        /* CÁPSULA DE STATUS VIP (Glassmorphism integrado ao cabeçalho) */
+        .user-status-bar { max-width: 420px; margin: 15px auto 0 auto; padding: 8px 16px; display: none; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 30px; font-size: 13.5px; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .status-user-info { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background-color: #25D366; display: inline-block; animation: pulseGreen 2s infinite; }
+        @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+        
+        .status-actions-group { display: flex; align-items: center; gap: 6px; }
+        .btn-status-action { background: rgba(255, 255, 255, 0.12); color: #fff; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+        .btn-status-action:hover { background: rgba(255, 255, 255, 0.22); }
 
         /* VITRINE DE PRÊMIOS */
-        .prizes-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 900px; margin: -30px auto 20px auto; padding: 0 15px; }
+        .prizes-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 900px; margin: -30px auto 20px auto; padding: 0 15px; position: relative; z-index: 5; }
         .prize-card { background: white; border-radius: 15px; padding: 20px 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); position: relative; overflow: hidden; border: 1px solid #eaeaea; flex: 1; min-width: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.3s;}
         .top-ouro { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #FFD700, #FFA500); }
         .top-prata { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #C0C0C0, #808080); }
@@ -37,7 +38,7 @@
         .prize-name { font-size: 20px; font-weight: 900; color: #2a5298; margin-bottom: 10px;}
         .prize-img { width: 120px; height: auto; object-fit: contain; margin-top: 10px; border-radius: 8px;}
 
-        /* PREÇO E URGÊNCIA (Dica 01) */
+        /* PREÇO E URGÊNCIA */
         .price-card { background: white; border-radius: 15px; padding: 20px 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-width: 300px; margin: 0 auto 15px auto; position: relative; overflow: hidden; border: 1px solid #eaeaea; }
         .card-top-green { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: #4CAF50; }
         .ticket-price { font-size: 28px; font-weight: 900; color: #2E8B57; }
@@ -45,7 +46,7 @@
         .urgencia-banner { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px 15px; border-radius: 10px; margin: 0 auto 30px auto; max-width: 650px; text-align: center; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 92%; }
         .urgencia-banner b { color: #d39e00; }
 
-        /* GRID E BOTÕES */
+        /* GRID E ELEMENTOS DE SELEÇÃO */
         .instrucoes { text-align: center; margin: 10px 0 20px 0; font-size: 18px; font-weight: bold; color: #444; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(55px, 1fr)); gap: 10px; max-width: 650px; margin: 0 auto 50px auto; padding: 0 15px; }
         .number-box { padding: 15px 0; font-size: 18px; font-weight: bold; border-radius: 10px; cursor: pointer; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.08); transition: all 0.2s ease; }
@@ -56,13 +57,13 @@
         .number-box.selecionado { background-color: #2a5298; color: white; border: 2px solid #2a5298; transform: scale(1.05); box-shadow: 0 0 15px rgba(42,82,152,0.4); }
         #loading { text-align: center; font-weight: bold; color: #2a5298; margin: 20px; font-size: 18px; }
 
-        /* BARRA DE CHECKOUT */
+        /* BARRA DE COMPRA (INFERIOR) */
         .checkout-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.2); display: none; justify-content: space-between; align-items: center; z-index: 100; border-top-left-radius: 20px; border-top-right-radius: 20px; }
         .checkout-info { font-size: 14px; font-weight: bold; color: #555; line-height: 1.2;}
         .checkout-total { color: #2E8B57; font-size: 24px; font-weight: 900; display: block; margin-top: 2px;}
         .checkout-btn { background: linear-gradient(90deg, #2E8B57, #267347); color: white; border: none; padding: 15px 25px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(46,139,87,0.3); transition: 0.3s;}
 
-        /* MODAIS */
+        /* MODAIS DA PÁGINA */
         #modal, #modalEdicao, #modalAviso { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 92%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); overflow-y: auto; max-height: 90vh; }
         input { width: 100%; padding: 14px; margin: 8px 0 15px 0; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; outline: none; transition: border 0.3s; }
@@ -80,9 +81,9 @@
         .aviso-content { border-top: 5px solid #f44336; }
         .btn-aviso { background: #f44336; color: white; margin-top: 15px; }
 
-        /* PROVA SOCIAL (Dica 02) */
+        /* TOAST DE PROVA SOCIAL REALTIME */
         .toast-container { position: fixed; bottom: 90px; left: 15px; z-index: 90; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { background: rgba(255, 255, 255, 0.95); color: #333; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 4px solid #25D366; animation: slideInLeft 0.5s, fadeOut 0.5s 4.5s forwards; display: flex; align-items: center; gap: 10px; max-width: 250px; }
+        .toast { background: rgba(255, 255, 255, 0.95); color: #333; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 4px solid #25D366; animation: slideInLeft 0.5s, fadeOut 0.5s 5.5s forwards; display: flex; align-items: center; gap: 10px; max-width: 250px; }
         @keyframes slideInLeft { from { transform: translateX(-120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
     </style>
@@ -93,17 +94,16 @@
         <img src="https://i.postimg.cc/YqkptFRW/Design-sem-nome-(4).png" alt="Logótipo" class="logo">
         <h1>PIX INFLUÊNCIA</h1>
         <p>🍀 Transformando vidas com jogos reais e pagos</p>
-    </div>
-
-    <!-- BARRA DE STATUS VIP -->
-    <div id="userStatusBar" class="user-status-bar">
-        <div class="status-user-info">
-            <span class="status-dot"></span>
-            <span>Olá, <b id="statusNome"></b>! <span id="statusZap" style="color: #666; font-size: 13px; font-weight: normal; margin-left: 5px;"></span></span>
-        </div>
-        <div style="display: flex; gap: 8px;">
-            <button class="btn-status-action" onclick="abrirModalEdicao()">✏️ Meus Dados</button>
-            <button class="btn-status-action" onclick="desconectarUsuario()" style="color: #f44336; background: #ffebee;" title="Sair">🚪</button>
+        
+        <div id="userStatusBar" class="user-status-bar">
+            <div class="status-user-info">
+                <span class="status-dot"></span>
+                <span>VIP: <b id="statusNome" style="color: #FFD700;"></b> <span id="statusZap" style="opacity: 0.7; font-size: 12px; font-weight: normal; margin-left: 3px;"></span></span>
+            </div>
+            <div class="status-actions-group">
+                <button class="btn-status-action" onclick="abrirModalEdicao()">✏️ Editar</button>
+                <button class="btn-status-action" onclick="desconectarUsuario()" style="background: rgba(244, 67, 54, 0.2); color: #ff8a80;" title="Sair">🚪</button>
+            </div>
         </div>
     </div>
 
@@ -116,7 +116,6 @@
         <p style="font-size: 12px; color: #888; margin-top: 5px;">Apenas números pagos concorrem.</p>
     </div>
 
-    <!-- GATILHO DE ESCASSEZ -->
     <div class="urgencia-banner">
         ⏳ <b>Atenção:</b> Reservas não pagas em <b>30 minutos</b> serão canceladas e voltarão a ficar disponíveis.
     </div>
@@ -126,19 +125,18 @@
     
     <div class="grid" id="grid"></div>
 
-    <!-- BARRA DE CHECKOUT -->
     <div id="checkoutBar" class="checkout-bar">
         <div class="checkout-info">
             <span id="qtdCheckout">0</span> cotas selecionadas<br>
             <span class="checkout-total" id="totalCheckout">R$ 0,00</span>
         </div>
-        <button class="checkout-btn" onclick="abrirModalCompra()">Reservar Agora ➔</button>
+        <div class="status-actions-group">
+            <button class="checkout-btn" onclick="abrirModalCompra()">Reservar Agora ➔</button>
+        </div>
     </div>
 
-    <!-- CONTAINER DA PROVA SOCIAL -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- MODAL DE COMPRA -->
     <div id="modal">
         <div class="modal-content">
             <div id="telaForm">
@@ -179,7 +177,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO DE DADOS -->
     <div id="modalEdicao">
         <div class="modal-content">
             <h2 style="color: #2a5298; margin-top: 0;">Meus Dados</h2>
@@ -193,7 +190,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE AVISO / ERRO -->
     <div id="modalAviso">
         <div class="modal-content aviso-content">
             <div style="font-size: 50px;">⚠️</div>
@@ -209,6 +205,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1a2Rrb3RjenFpbmR5dGdncHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MzQ3NzMsImV4cCI6MjA5ODUxMDc3M30.YTx_2J0Ebr-fiXftPJqgvU90pRpkx664dKN9F2RxVjA';
         const banco = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // CONFIGURAÇÕES ADMINISTRATIVAS
         const SEU_WHATSAPP_ADMIN = "5575999512480"; 
         const MINHA_CHAVE_PIX = "75999512480"; 
         const NOME_RECEBEDOR = "JESSICA SOUZA DO NASCIMENTO"; 
@@ -235,7 +232,7 @@
         aplicarMascara('whatsapp');
         aplicarMascara('editWhatsapp');
 
-        function mostrarErro(mensagem) { document.getElementById('textoAviso').innerText = mensagem; document.getElementById('modalAviso').style.display = 'flex'; }
+        function mostrarErro(mensagem) { document.getElementById('textoAviso').innerText = mensaje; document.getElementById('modalAviso').style.display = 'flex'; }
         function formatarMoeda(valor) { return "R$ " + parseFloat(valor).toFixed(2).replace('.', ','); }
         function converterImagem(caminho) {
             if(!caminho) return "";
@@ -244,36 +241,7 @@
         }
 
         // ==========================================
-        // 🚀 PROVA SOCIAL (SIMULADOR DE VENDAS)
-        // ==========================================
-        const nomesProvaSocial = ["Ana C.", "Carlos M.", "Pedro H.", "Maria S.", "João P.", "Lucas T.", "Juliana F.", "Marcos R.", "Fernanda A.", "Rafael D.", "Aline V.", "Bruno K."];
-        
-        function dispararProvaSocial() {
-            if(!edicaoEstaAberta) return; // Não dispara se o sorteio já ocorreu
-
-            let container = document.getElementById('toastContainer');
-            let nome = nomesProvaSocial[Math.floor(Math.random() * nomesProvaSocial.length)];
-            let qtd = Math.floor(Math.random() * 6) + 2; // Simula entre 2 e 7 cotas
-            
-            let toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<span style="font-size:18px;">🛒</span> <span><b>${nome}</b> acabou de reservar ${qtd} cotas!</span>`;
-            
-            container.appendChild(toast);
-            
-            // Apaga do HTML depois de 5 segundos
-            setTimeout(() => { toast.remove(); }, 5000);
-            
-            // Programa a próxima notificação (aleatório entre 8 a 18 segundos)
-            let proximoTempo = Math.floor(Math.random() * 10000) + 8000;
-            setTimeout(dispararProvaSocial, proximoTempo);
-        }
-        
-        // Inicia a prova social 4 segundos após a página carregar
-        setTimeout(dispararProvaSocial, 4000);
-
-        // ==========================================
-        // 👤 GESTÃO DO USUÁRIO
+        // 👤 CONTROLE DE INFORMAÇÕES DE CADASTRO LOCAL (VIP STATUS)
         // ==========================================
         function checarStatusUsuario() {
             let nome = localStorage.getItem('user_nome');
@@ -328,11 +296,29 @@
         async function registrarUsuarioSupabase(nome, whatsapp) {
             try {
                 await banco.from('usuarios').upsert({ nome_completo: nome, whatsapp: whatsapp }, { onConflict: 'whatsapp' });
-            } catch (erro) { console.error('Erro:', erro); }
+            } catch (erro) { console.error('Erro de sincronização de perfil:', erro); }
         }
 
         // ==========================================
-        // 🎲 SISTEMA DA RIFA
+        // 🎯 LÓGICA DE EXIBIÇÃO DAS NOTIFICAÇÕES REAIS
+        // ==========================================
+        function exibirToastReal(nome, qtd) {
+            if(!edicaoEstaAberta) return;
+
+            let container = document.getElementById('toastContainer');
+            let toast = document.createElement('div');
+            toast.className = 'toast';
+            let textoCota = qtd > 1 ? 'cotas' : 'cota';
+            let primeiroNome = nome.split(' ')[0]; 
+            
+            toast.innerHTML = `<span style="font-size:18px;">🛒</span> <span><b>${primeiroNome}</b> acabou de garantir ${qtd} ${textoCota}!</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 6000);
+        }
+
+        // ==========================================
+        // 🎲 SISTEMA DINÂMICO DE ATUALIZAÇÃO DA RIFA
         // ==========================================
         async function iniciarSistema() {
             try {
@@ -489,6 +475,7 @@
                     let totalPagar = formatarMoeda(numerosEscolhidos.length * VALOR_UNITARIO);
                     let strNumeros = numerosEscolhidos.join(', ');
                     
+                    // Salva sessão local e no Supabase
                     localStorage.setItem('user_nome', nome);
                     localStorage.setItem('user_whatsapp', whatsapp);
                     registrarUsuarioSupabase(nome, whatsapp);
@@ -500,6 +487,7 @@
                     document.getElementById('numSucesso').innerText = strNumeros;
                     document.getElementById('valorTotalSucesso').innerText = "Total: " + totalPagar;
                     
+                    // Links dinâmicos de envio
                     let msg = `Olá! O meu nome é ${nome}. Reservei as cotas [${strNumeros}] no Pix Influência. Segue o comprovante de ${totalPagar}:`;
                     document.getElementById('linkZap').href = `https://wa.me/${SEU_WHATSAPP_ADMIN}?text=${encodeURIComponent(msg)}`;
                     
@@ -509,6 +497,7 @@
                     numerosEscolhidos = [];
                     atualizarBarraCheckout();
                     
+                    // Liberação do botão para próximas compras
                     btn.innerText = "Concluir Reserva";
                     btn.disabled = false;
                     
@@ -533,11 +522,43 @@
             });
         }
 
+        // ==========================================
+        // 🛰️ RADAR EM TEMPO REAL COM NOTIFICAÇÃO 100% REAL
+        // ==========================================
+        let agendadorToasts = new Map();
+
         banco.channel('monitoramento_ao_vivo')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'sorteio' }, () => { carregarNumeros(); })
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'sorteio' }, (payload) => { 
+                // Atualiza a grelha visual
+                carregarNumeros(); 
+
+                // Processa a notificação real
+                let novoStatus = payload.new.status ? payload.new.status.toLowerCase() : '';
+                let statusAntigo = payload.old.status ? payload.old.status.toLowerCase() : '';
+                
+                if ((novoStatus === 'reservado' || novoStatus === 'pago') && statusAntigo === 'livre') {
+                    let nomeCliente = payload.new.nome ? payload.new.nome : 'Alguém';
+                    
+                    if (agendadorToasts.has(nomeCliente)) {
+                        agendadorToasts.set(nomeCliente, agendadorToasts.get(nomeCliente) + 1);
+                    } else {
+                        agendadorToasts.set(nomeCliente, 1);
+                    }
+
+                    // Junta registros múltiplos de uma transação num único aviso acumulado
+                    setTimeout(() => {
+                        if (agendadorToasts.has(nomeCliente)) {
+                            let qtdComprada = agendadorToasts.get(nomeCliente);
+                            exibirToastReal(nomeCliente, qtdComprada);
+                            agendadorToasts.delete(nomeCliente);
+                        }
+                    }, 1200);
+                }
+            })
             .on('postgres_changes', { event: '*', schema: 'public', table: 'gerenciador' }, () => { iniciarSistema(); })
             .subscribe();
 
+        // INICIALIZAÇÃO DA SESSÃO
         checarStatusUsuario();
         iniciarSistema();
     </script>
