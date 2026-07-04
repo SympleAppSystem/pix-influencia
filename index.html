@@ -267,8 +267,16 @@
                     let meuZapAdmin = "557599129613"; 
                     let minhaApiBot = "7098636"; 
                     
-                    let textoAbandono = `🛒 *CARRINHO ABANDONADO*\n👤 Cliente: ${nome}\n🎟️ Cotas: ${strNumeros}\n💰 Valor: ${total}\n\n📲 Tentar recuperar venda:\nhttps://wa.me/${whatsapp}`;
-                    fetch(`https://api.callmebot.com/whatsapp.php?phone=${meuZapAdmin}&text=${encodeURIComponent(textoAbandono)}&apikey=${minhaApiBot}`, { mode: 'no-cors' }).catch(()=>{});// Para não ficar a enviar ao banco a cada letra que ele digitar depois disso
+                    // 1. O texto que vai aparecer PRONTO para enviar ao cliente
+                    let msgClienteAbandono = `Olá, ${nome}! Tudo bem? Vi aqui que tentou separar a(s) cota(s) [${strNumeros}] na nossa rifa, mas parou no meio do caminho. Teve alguma dúvida ou dificuldade com o site? Posso ajudar!`;
+                    
+                    // 2. O link mágico do WhatsApp com o texto embutido
+                    let linkWppClienteAbandono = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msgClienteAbandono)}`;
+                    
+                    // 3. A mensagem que chega para SI no CallMeBot
+                    let textoAbandono = `🛒 *CARRINHO ABANDONADO*\n👤 Cliente: ${nome}\n🎟️ Cotas: ${strNumeros}\n💰 Valor: ${total}\n\n📲 Tentar recuperar venda (Clique abaixo):\n${linkWppClienteAbandono}`;
+                    
+                    fetch(`https://api.callmebot.com/whatsapp.php?phone=${meuZapAdmin}&text=${encodeURIComponent(textoAbandono)}&apikey=${minhaApiBot}`, { mode: 'no-cors' }).catch(()=>{});
                 } catch (erro) { console.log("Lead Silencioso Falhou", erro); }
             }
         }
@@ -549,8 +557,17 @@
                     let meuZapAdmin = "557599129613"; 
                     let minhaApiBot = "7098636"; 
                     
-                    let textoReserva = `✅ *NOVA RESERVA!*\n👤 Cliente: ${nome}\n🎟️ Cotas: ${strNumeros}\n💰 Valor: ${totalPagar}\n\n📲 Iniciar atendimento:\nhttps://wa.me/${whatsapp}`;                    
+                    // 1. O texto que vai aparecer PRONTO para enviar ao cliente
+                    let msgClienteReserva = `Olá, ${nome}! Parabéns pela reserva da(s) cota(s) [${strNumeros}] no Pix Influência. O valor é de ${totalPagar}.\n\nPara garantir os seus números antes que eles expirem, a nossa chave PIX é: ${MINHA_CHAVE_PIX}\n\nAssim que fizer o pagamento, é só mandar o comprovante por aqui mesmo!`;
+                    
+                    // 2. O link mágico do WhatsApp com o texto embutido
+                    let linkWppClienteReserva = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msgClienteReserva)}`;
+                    
+                    // 3. A mensagem que chega para SI no CallMeBot
+                    let textoReserva = `✅ *NOVA RESERVA!*\n👤 Cliente: ${nome}\n🎟️ Cotas: ${strNumeros}\n💰 Valor: ${totalPagar}\n\n📲 Iniciar atendimento e cobrar (Clique abaixo):\n${linkWppClienteReserva}`;
+                    
                     fetch(`https://api.callmebot.com/whatsapp.php?phone=${meuZapAdmin}&text=${encodeURIComponent(textoReserva)}&apikey=${minhaApiBot}`, { mode: 'no-cors' }).catch(()=>{});
+                    
                     localStorage.setItem('user_nome', nome);
                     localStorage.setItem('user_whatsapp', whatsapp);
                     registrarUsuarioCompra(nome, whatsapp);
