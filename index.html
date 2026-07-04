@@ -306,31 +306,31 @@
         // A MÁGICA DA EDIÇÃO BLINDADA
         async function salvarEdicao() {
             let novoNome = document.getElementById('editNome').value.trim();
-            let novoWhatsapp = document.getElementById('editWhatsapp').value.trim();
-            let whatsappAntigo = localStorage.getItem('user_whatsapp');
+            // Pegamos o WhatsApp que está salvo de forma segura no navegador
+            let meuWhatsapp = localStorage.getItem('user_whatsapp'); 
 
-            if (!novoNome || novoWhatsapp.length !== 13) { mostrarErro("Preencha o nome e os 13 números do WhatsApp."); return; }
-
-            // Se o usuário mudou o número, verificamos e usamos o UPDATE
-            if (novoWhatsapp !== whatsappAntigo) {
-                const { error } = await banco.from('usuarios').update({ whatsapp: novoWhatsapp, nome_completo: novoNome }).eq('whatsapp', whatsappAntigo);
-                
-                if (error) {
-                    // Erro 23505 = Violar a regra ÚNICA (O número já existe no banco)
-                    mostrarErro("🚨 Este número já está registado para outra pessoa. Se for seu, saia da conta atual (🚪) e reserve novamente com ele.");
-                    return;
-                }
-            } else {
-                // Se só mudou o nome, atualiza tranquilo
-                await banco.from('usuarios').update({ nome_completo: novoNome }).eq('whatsapp', whatsappAntigo);
+            if (!novoNome) { 
+                mostrarErro("Por favor, preencha o seu nome."); 
+                return; 
             }
 
-            // Se chegou aqui, deu tudo certo! Salva local e atualiza a tela
+            // 1. Atualiza o NOME no perfil do cliente (Tabela usuários)
+            await banco.from('usuarios')
+                .update({ nome_completo: novoNome })
+                .eq('whatsapp', meuWhatsapp);
+
+            // 2. A MÁGICA RECUPERADA: Atualiza o NOME em todos os bilhetes antigos (Tabela sorteio)
+            await banco.from('sorteio')
+                .update({ nome: novoNome })
+                .eq('whatsapp', meuWhatsapp);
+
+            // 3. Atualiza o navegador e fecha o modal
             localStorage.setItem('user_nome', novoNome);
-            localStorage.setItem('user_whatsapp', novoWhatsapp);
             document.getElementById('modalEdicao').style.display = 'none';
+            
+            // 4. Atualiza a tela visualmente para o cliente ver o nome novo na Barra VIP e na grelha
             checarStatusUsuario();
-            carregarNumeros(); // Atualiza a grelha por segurança
+            carregarNumeros();
         }
 
         // Cadastro durante a compra (Se o número já existir, ele assume a conta)
