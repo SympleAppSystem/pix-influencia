@@ -268,8 +268,7 @@
                     let minhaApiBot = "7098636"; 
                     
                     let textoAbandono = `🛒 *CARRINHO ABANDONADO*\n👤 Cliente: ${nome}\n🎟️ Cotas: ${strNumeros}\n💰 Valor: ${total}\n\n📲 Tentar recuperar venda:\nhttps://wa.me/${whatsapp}`;
-                    
-                    fetch(`https://api.callmebot.com/whatsapp.php?phone=${meuZapAdmin}&text=${encodeURIComponent(textoAbandono)}&apikey=${minhaApiBot}`).catch(()=>{});// Para não ficar a enviar ao banco a cada letra que ele digitar depois disso
+                    fetch(`https://api.callmebot.com/whatsapp.php?phone=${meuZapAdmin}&text=${encodeURIComponent(textoAbandono)}&apikey=${minhaApiBot}`, { mode: 'no-cors' }).catch(()=>{});// Para não ficar a enviar ao banco a cada letra que ele digitar depois disso
                 } catch (erro) { console.log("Lead Silencioso Falhou", erro); }
             }
         }
@@ -550,10 +549,8 @@
                     let meuZapAdmin = "557599129613"; 
                     let minhaApiBot = "7098636"; 
                     
-                    let textoReserva = `✅ *NOVA RESERVA!*\n👤 Cliente: ${nome}\n🎟️ Cotas: ${strNumeros}\n💰 Valor: ${totalPagar}\n\n📲 Iniciar atendimento:\nhttps://wa.me/${whatsapp}`;
-                    
-                    fetch(`https://api.callmebot.com/whatsapp.php?phone=${meuZapAdmin}&text=${encodeURIComponent(textoReserva)}&apikey=${minhaApiBot}`).catch(()=>{});
-
+                    let textoReserva = `✅ *NOVA RESERVA!*\n👤 Cliente: ${nome}\n🎟️ Cotas: ${strNumeros}\n💰 Valor: ${totalPagar}\n\n📲 Iniciar atendimento:\nhttps://wa.me/${whatsapp}`;                    
+                    fetch(`https://api.callmebot.com/whatsapp.php?phone=${meuZapAdmin}&text=${encodeURIComponent(textoReserva)}&apikey=${minhaApiBot}`, { mode: 'no-cors' }).catch(()=>{});
                     localStorage.setItem('user_nome', nome);
                     localStorage.setItem('user_whatsapp', whatsapp);
                     registrarUsuarioCompra(nome, whatsapp);
