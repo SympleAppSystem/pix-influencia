@@ -192,8 +192,12 @@
             <h2 style="color: #2a5298; margin-top: 0;">Meus Dados</h2>
             <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Atualize suas informações de contato. Elas serão salvas para suas próximas compras.</p>
             
+            <!-- O input de nome continua livre -->
             <input type="text" id="editNome" placeholder="O seu Nome Completo">
-            <input type="tel" id="editWhatsapp" placeholder="WhatsApp (55...)" maxlength="13">
+            
+            <!-- O input do WhatsApp agora está BLOQUEADO (disabled) -->
+            <label style="font-size: 12px; color: #888; text-align: left; display: block; margin-left: 5px; margin-bottom: -5px;">WhatsApp (Não pode ser alterado)</label>
+            <input type="tel" id="editWhatsapp" placeholder="WhatsApp (55...)" maxlength="13" disabled style="background-color: #f1f3f5; cursor: not-allowed; color: #777;">
             
             <button onclick="salvarEdicao()" style="background: #2E8B57;">Salvar Alterações</button>
             <button class="close-btn" onclick="document.getElementById('modalEdicao').style.display = 'none'">Cancelar</button>
